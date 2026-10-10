@@ -61,4 +61,5 @@ def main():
     print(f"average recall@1: {avg_recall_at_1}")
     
 
-main()
+if __name__ == "__main__":
+    main()

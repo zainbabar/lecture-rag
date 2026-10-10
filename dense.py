@@ -49,8 +49,9 @@ def rank_embeddings(query_embedding, embeddings, k):
     return top_k
 
 def retrive(question, chunks, embeddings, model, k=3):
+    query = question['question']
     bge_instruction = "Represent this sentence for searching relevant passages: "
-    query_embedding = model.encode(bge_instruction + question)
+    query_embedding = model.encode(bge_instruction + query)
 
     # get top k similar text indicies to query
     top_k_indicies = rank_embeddings(query_embedding, embeddings, k)
@@ -92,8 +93,7 @@ def main():
     for question in eval_set['questions']:
         if question['score_retrieval'] == False:
             continue
-        q = question['question'] # the acutal question text
-        retrived_ids = retrive(q, chunks, embeddings, model, k)
+        retrived_ids = retrive(question, chunks, embeddings, model, k)
         gold_ids = question['gold_chunk_ids']
         recall5 = recall_at_k(retrived_ids, gold_ids, 5)
         recall3 = recall_at_k(retrived_ids, gold_ids, 3)
@@ -113,4 +113,5 @@ def main():
     print(f"average recall@1: {avg_recall_at_1}")
     
 
-main()
+if __name__ == "__main__":
+    main()
