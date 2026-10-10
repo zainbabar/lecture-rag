@@ -1,0 +1,35 @@
+# Local corpus conversion/review helpers
+/scripts/pdf_pages.py
+/scripts/check_corpus.py
+/check
+
+# Working roadmap
+/docs/ideas.md
+
+# Local environments and credentials
+.venv/
+.env
+.env.*
+!.env.example
+
+# Python and tooling caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Generated artifacts and model caches
+.cache/
+artifacts/
+tmp/
+
+# macOS/editor files
+.DS_Store
+*.swp
+*.swo

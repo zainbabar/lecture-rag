@@ -1,0 +1,798 @@
+{
+  "schema_version": 1,
+  "labelled_on": "2026-10-08",
+  "corpus": {
+    "files": [
+      "lectures/lecture-01-introduction-to-vector-spaces.md",
+      "lectures/lecture-02-more-examples-and-vector-space-properties.md",
+      "lectures/lecture-03-subspaces.md",
+      "lectures/lecture-04-span-and-linear-independence.md",
+      "lectures/lecture-05-bases-and-dimension.md",
+      "lectures/lecture-06-properties-of-finite-dimensional-vector-spaces.md",
+      "lectures/lecture-07-coordinates-of-a-vector-space.md"
+    ],
+    "exclude_chunk_types": [
+      "intro"
+    ]
+  },
+  "scoring": {
+    "k": 3,
+    "policy": "Score answerable questions using their designated gold IDs. Multi-source gold sets require multiple chunks for complete evidence; recall@k measures coverage and MRR measures the first gold hit. Q01–Q08 still retain their original primary-source targets. Unanswerables stay out of retrieval metrics and are retained for later abstention checks."
+  },
+  "label_notes": [
+    "Existing questions and primary sources are unchanged. These IDs map the existing labels, not all possible relevant evidence.",
+    "Q07: Remark 6.2 is also valid answer evidence; Lemma 5.2 can justify the bound using a basis. Flagged alternatives are not accepted substitutes under the original scoring.",
+    "Q07 requires lecture introductory context, preserved in lecture_intro but not yet prepended to retrieval text.",
+    "Expanded to 30 questions on 2026-10-08. Original Q01–Q09 question text and gold/supporting IDs unchanged. Gold IDs are designated evidence targets, not an exhaustive relevance annotation. New multi-source gold sets contain all designated required evidence; do not treat supporting IDs as gold.",
+    "This is a development set, not a held-out test set. Do not tune repeatedly on it and present the result as unseen generalization. Cross-lecture questions deliberately specify separate evidence needs."
+  ],
+  "questions": [
+    {
+      "id": "Q01",
+      "title": "Vector-space definition",
+      "question": "What conditions must addition and scalar multiplication satisfy before a set counts as a vector space?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Operations and all eight vector-space axioms.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            2,
+            3
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "paraphrased_definition"
+    },
+    {
+      "id": "Q02",
+      "title": "Cancellation",
+      "question": "If adding the same vector to two vectors gives the same result, what can I conclude, and why?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.7"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Additive cancellation and proof using the additive inverse.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.7",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            8,
+            9
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "paraphrased_definition"
+    },
+    {
+      "id": "Q03",
+      "title": "A subspace example",
+      "question": "Do the polynomials that equal zero at $x=2$ form a subspace? How would I check?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.7"
+      ],
+      "supporting_chunk_ids": [
+        "lecture-03-unit-3.4",
+        "lecture-03-unit-3.5"
+      ],
+      "score_retrieval": true,
+      "rationale": "Nonemptiness and closure for polynomials vanishing at 2.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.7",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            4
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "example_lookup"
+    },
+    {
+      "id": "Q04",
+      "title": "What span guarantees",
+      "question": "If a subspace contains my chosen vectors, what other vectors is it forced to contain?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Any subspace containing S contains its span and all linear combinations.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "paraphrased_definition"
+    },
+    {
+      "id": "Q05",
+      "title": "Redundancy",
+      "question": "How can I recognize that one vector in a set is redundant for linear independence?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.10"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Dependence iff one vector is a combination of the others; assumes at least two vectors.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.10",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            9,
+            10
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "paraphrased_definition"
+    },
+    {
+      "id": "Q06",
+      "title": "Polynomial dimension",
+      "question": "How many basis vectors does the space of polynomials of degree at most $n$ need?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.8"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Polynomial standard basis 1,x,...,x^n has n+1 elements.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            13,
+            14
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "symbol_heavy"
+    },
+    {
+      "id": "Q07",
+      "title": "Dimension limit",
+      "question": "How large can a linearly independent set be in a four-dimensional vector space?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Independent sets have at most four vectors; a basis attains four. Requires introductory assumption dim(V)=n.",
+      "required_context": "Lecture 6 introduction: V is a vector space over F with dim(V)=n.",
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            1
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "paraphrased_definition"
+    },
+    {
+      "id": "Q08",
+      "title": "Unique coordinates",
+      "question": "Why does a basis let me represent a vector in one and only one way?",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Spanning gives existence; independence gives uniqueness by subtracting representations.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            6
+          ],
+          "method": "Compared chunk body with original PDF page text; selected pages also visually inspected."
+        }
+      ],
+      "bucket": "paraphrased_definition"
+    },
+    {
+      "id": "Q09",
+      "title": "Outside the current lectures",
+      "question": "How do I compute the eigenvalues of a matrix?",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "No eigenvalue-computation evidence in Lectures 1–7; closest matches are insufficient.",
+      "required_context": null,
+      "verification": [],
+      "bucket": "unanswerable"
+    },
+    {
+      "id": "Q10",
+      "title": "What two properties must a collection of vectors have to serve as a basis",
+      "question": "What two properties must a collection of vectors have to serve as a basis?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Basis means spanning and independent.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            12
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q11",
+      "title": "For a finite-dimensional vector space, what does its dimension count",
+      "question": "For a finite-dimensional vector space, what does its dimension count?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Dimension counts vectors in any basis.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            13
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q12",
+      "title": "Why do we need an ordered basis rather than just a set when writing coordinate tuples",
+      "question": "Why do we need an ordered basis rather than just a set when writing coordinate tuples?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The basis order determines which vector each coordinate belongs to.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q13",
+      "title": "What does [v]_B mean, and what happens to its entries if I swap two vectors in B",
+      "question": "What does [v]_B mean, and what happens to its entries if I swap two vectors in B?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Coordinates are coefficients in basis order; reordering permutes entries.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            7,
+            8
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q14",
+      "title": "What must a smaller vector space inherit from a larger one to count as its subspace",
+      "question": "What must a smaller vector space inherit from a larger one to count as its subspace?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "A subspace uses the inherited addition and scalar multiplication.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            2
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q15",
+      "title": "In these notes, what degree is assigned to the zero polynomial",
+      "question": "In these notes, what degree is assigned to the zero polynomial?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The convention is deg(0)=-infinity.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            6
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q16",
+      "title": "Which exercise treats positive real numbers as vectors using multiplication as addition, and how does it define scalar multiplication",
+      "question": "Which exercise treats positive real numbers as vectors using multiplication as addition, and how does it define scalar multiplication?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.10"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The exercise specifies x plus y as xy and scalar multiplication as x^alpha; no solution is requested.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.10",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            10
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q17",
+      "title": "What basis and dimension do the notes give for the zero vector space",
+      "question": "What basis and dimension do the notes give for the zero vector space?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.9"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The empty set is the only basis, and dimension is zero.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.9",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            14
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q18",
+      "title": "Can C^n be treated as a vector space using only real scalars",
+      "question": "Can C^n be treated as a vector space using only real scalars?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Restricting scalars to R makes C^n a real vector space.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            4
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q19",
+      "title": "Find the worked example giving a basis for trace-zero 2 by 2 matrices. Which matrices form that basis and what is the dimension",
+      "question": "Find the worked example giving a basis for trace-zero 2 by 2 matrices. Which matrices form that basis and what is the dimension?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.8"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The basis is E_12, E_21, E_11-E_22; dimension three.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            4,
+            5
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q20",
+      "title": "For B=(1-x,1+x+x^2,1-x+x^2), what are the coordinates of 3+3x+5x^2, and how are they found",
+      "question": "For B=(1-x,1+x+x^2,1-x+x^2), what are the coordinates of 3+3x+5x^2, and how are they found?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.7"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The corrected example equates coefficients and obtains (-2,3,2). The x^2 correction was user-confirmed.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.7",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            9
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q21",
+      "title": "Which worked matrix-spanning example ends with rank 3 even though its ambient space has dimension 4, and what does that imply",
+      "question": "Which worked matrix-spanning example ends with rank 3 even though its ambient space has dimension 4, and what does that imply?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.11"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "This five-matrix example does not span M_2(F), because its coordinate matrix has rank three.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.11",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            11
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q22",
+      "title": "How are [v+w]_B and [alpha v]_B related to the individual coordinate vectors",
+      "question": "How are [v+w]_B and [alpha v]_B related to the individual coordinate vectors?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.5"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Coordinates preserve vector addition and scalar multiplication.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q23",
+      "title": "If alpha u = alpha v, which condition on alpha lets me cancel it, and why",
+      "question": "If alpha u = alpha v, which condition on alpha lets me cancel it, and why?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.7"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Alpha must be nonzero so multiplication by its inverse is defined.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.7",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            8,
+            9
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q24",
+      "title": "What is Span(empty set), and is the empty set linearly independent",
+      "question": "What is Span(empty set), and is the empty set linearly independent?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.1",
+        "lecture-04-unit-4.8"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "One passage states the empty span is {0}; the other declares the empty set independent.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            6
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        },
+        {
+          "chunk_id": "lecture-04-unit-4.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            8,
+            9
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q25",
+      "title": "In the P_3(F) example starting from {1+x,1-x^2}, which two polynomials are added to obtain a basis",
+      "question": "In the P_3(F) example starting from {1+x,1-x^2}, which two polynomials are added to obtain a basis?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Adds x^3 then x, with independence reasoning.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            2
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q26",
+      "title": "Polynomial subspace and basis extension",
+      "question": "Explain why polynomials vanishing at 2 form a subspace, then state what basis-extension guarantee applies to independent sets in finite-dimensional vector spaces.",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.7",
+        "lecture-06-unit-6.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The polynomial example proves subspace closure; the later theorem gives the explicitly requested finite-dimensional extension guarantee.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.7",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            4
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        },
+        {
+          "chunk_id": "lecture-06-unit-6.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            2
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q27",
+      "title": "Give the standard basis and dimension of P_4(F), then show how the notes represent a0+a1x+a2x^2+a3x^3+a4x^4 in that ordered basis.",
+      "question": "Give the standard basis and dimension of P_4(F), then show how the notes represent a0+a1x+a2x^2+a3x^3+a4x^4 in that ordered basis.",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.8",
+        "lecture-07-unit-7.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Standard basis/dimension and the worked coordinate tuple are separately requested.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            13,
+            14
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        },
+        {
+          "chunk_id": "lecture-07-unit-7.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q28",
+      "title": "What criterion tells me which vector can be removed from a dependent set, and which later lemma says repeated removal preserves the span until an independent subset remains",
+      "question": "What criterion tells me which vector can be removed from a dependent set, and which later lemma says repeated removal preserves the span until an independent subset remains?",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.10",
+        "lecture-05-unit-5.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The redundancy criterion and the finite removal lemma give both requested pieces.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.10",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            9,
+            10
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        },
+        {
+          "chunk_id": "lecture-05-unit-5.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            11
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q29",
+      "title": "First define a basis, then explain why it gives every vector unique coefficients and how those coefficients form [v]_B.",
+      "question": "First define a basis, then explain why it gives every vector unique coefficients and how those coefficients form [v]_B.",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.3",
+        "lecture-07-unit-7.1",
+        "lecture-07-unit-7.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Needs the basis definition, uniqueness theorem, and ordered coordinate-vector definition.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            12
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        },
+        {
+          "chunk_id": "lecture-07-unit-7.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            6
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        },
+        {
+          "chunk_id": "lecture-07-unit-7.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            7,
+            8
+          ],
+          "method": "Compared required evidence with Markdown and original PDF page text. Known corrections disclosed in corpus audit."
+        }
+      ]
+    },
+    {
+      "id": "Q30",
+      "title": "How do I compute a singular value decomposition and use it to find the best rank-k approximation of a matrix",
+      "question": "How do I compute a singular value decomposition and use it to find the best rank-k approximation of a matrix?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Lectures 1–7 contain no SVD or low-rank approximation procedure.",
+      "required_context": null,
+      "verification": []
+    }
+  ],
+  "name": "Lectures 1–7 development eval v1"
+}

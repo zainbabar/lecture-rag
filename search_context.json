@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "global_assumptions": "F denotes R or C unless a different scalar field is explicitly specified.",
+  "chunk_assumptions": {
+    "lecture-06-unit-6.1": "V is a vector space over F with dim(V)=n.",
+    "lecture-06-unit-6.6": "V is a vector space over F with dim(V)=n."
+  },
+  "source_notes": {
+    "global_assumptions": "Week 1 PDF p. 2: throughout the course F denotes R or C. Explicit exceptions in a unit take precedence.",
+    "lecture-06-unit-6.1": "Lecture 6 intro / Week 3 PDF p. 1.",
+    "lecture-06-unit-6.6": "Uses n from the same Lecture 6 intro."
+  },
+  "policy": "Prefix + global field convention + explicitly reviewed unit assumptions + unchanged body. Intro metadata and Source checks are not appended. No LLM extraction at runtime."
+}
