@@ -81,8 +81,6 @@ def main():
 
     eval_set, chunks = prepare_experiment()
 
-    question = "what makes a set of vectors a basis?"
-
     embeddings = embed_chunks(chunks, model)
 
     k = 5
