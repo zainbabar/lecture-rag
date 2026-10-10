@@ -85,9 +85,11 @@ def main():
 
     embeddings = embed_chunks(chunks, model)
 
-    k = 3
+    k = 5
 
-    recall_scores = []
+    recall5_scores = []
+    recall3_scores = []
+    recall1_scores = []
 
     for question in eval_set['questions']:
         if question['score_retrieval'] == False:
@@ -95,17 +97,22 @@ def main():
         q = question['question'] # the acutal question text
         retrived_ids = retrive(q, chunks, embeddings, model, k)
         gold_ids = question['gold_chunk_ids']
-        recall = recall_at_k(retrived_ids, gold_ids, k)
-        recall_scores.append(recall)
+        recall5 = recall_at_k(retrived_ids, gold_ids, 5)
+        recall3 = recall_at_k(retrived_ids, gold_ids, 3)
+        recall1 = recall_at_k(retrived_ids, gold_ids, 1)
+        recall5_scores.append(recall5)
+        recall3_scores.append(recall3)
+        recall1_scores.append(recall1)
         # inspect misses
-        if (recall < 1):
-            print(f'question: {q}, retrived ids: {retrived_ids}, gold ids: {gold_ids} \n')
-
         # print(f'{q}, top 3 retrived ids: {top_k_match_ids}, gold chunk ids: {question['gold_chunk_ids']}')
 
-    avg_recall_at_k = sum(recall_scores) / len(recall_scores)
+    avg_recall_at_5 = sum(recall5_scores) / len(recall5_scores)
+    avg_recall_at_3 = sum(recall3_scores) / len(recall3_scores)
+    avg_recall_at_1 = sum(recall1_scores) / len(recall1_scores)
 
-    print(f"average recall@3: {avg_recall_at_k}")
+    print(f"average recall@5: {avg_recall_at_5}")
+    print(f"average recall@3: {avg_recall_at_3}")
+    print(f"average recall@1: {avg_recall_at_1}")
     
 
 main()
