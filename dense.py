@@ -2,42 +2,34 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from prepare import prepare_experiment
 
-model = SentenceTransformer(
-    "BAAI/bge-small-en-v1.5",
-    device="mps",
-    local_files_only=True,
-)
-texts = [
-    "A basis is a linearly independent set that spans a vector space.",
-    "The dimension of a vector space is the number of vectors in a basis.",
-    "A subspace is closed under addition and scalar multiplication.",
-]
 
-embeddings = model.encode(texts)
+# prepare_experiment() returns eval set w/ questions and gold labels (specific / best chunk we want)
+# and chunks, the prepared and chunked lecture passages 
 
-question = "What makes a set of vectors a basis?"
+# chunks = list of dicts, one per lecture unit
+#   id: stable name like 'lecture-03-unit-3.7'
+#   search_text: the text we embed (prefix + assumptions + body)
+#   text: original body
+#   lecture, type, section, title: what this unit is
+#   source_file, pages: where it came from
+#   context_prefix, lecture_intro, assumptions: extra context
 
-query_embedding = model.encode( # bge recommended query instruction for embedding 
-    "Represent this sentence for searching relevant passages: " + question
-)
+# eval_set = dict describing the retrieval experiment
+#   corpus['files']: which lecture files we're searching
+#   questions: list of question dicts
+#     id, question: question identifier and actual question
+#     answerable: whether the corpus has enough evidence
+#     gold_chunk_ids: chunks we want search to find
+#     supporting_chunk_ids: useful extras, don't count as gold
+#     score_retrieval: whether to include it in retrieval metrics
 
-print(query_embedding.shape)
+# load the eval set and chunks
 
+def embed_chunks(chunks, model):
+    texts = [chunk['search_text'] for chunk in chunks] # collect the chunks search text (what we want to embed)
+    text_embeddings = model.encode(texts) # matrix of embeddings of all our chunks, 75 vectors -> shape is (75, 384)
+    return text_embeddings
 
-# have embedded our texts and our query, now see how similar they are 
-
-# use cosine similarity to get similiarity scores between the question
-# and each text embedding
-
-# sim_scores = []
-# q = query_embedding
-
-# similarity indicies in ascending order of similarity, so lowest to highest
-# sorted_indicies = np.argsort(sim_scores)
-
-# for i in reversed(sorted_indicies):
-#     print(f'text: {texts[i]}; similarity score: {sim_scores[i]}')
-    
 # scoring and sorting function. returns top k similar texts indicies 
 def rank_embeddings(query_embedding, embeddings, k):
     similarity_scores = []
@@ -56,11 +48,64 @@ def rank_embeddings(query_embedding, embeddings, k):
 
     return top_k
 
-top_indices = rank_embeddings(query_embedding, embeddings, k=2)
+def retrive(question, chunks, embeddings, model, k=3):
+    bge_instruction = "Represent this sentence for searching relevant passages: "
+    query_embedding = model.encode(bge_instruction + question)
 
-for i in top_indices:
-    print(i, texts[i])
-        
-        
+    # get top k similar text indicies to query
+    top_k_indicies = rank_embeddings(query_embedding, embeddings, k)
+    
+    # ids of the top k chunks corresponding to indicies in ranked order
+    top_k_chunks = []
 
-   
+    for i in top_k_indicies:
+        top_k_chunks.append(chunks[i]['id'])
+        
+    return top_k_chunks
+
+# measure recall@k (recall@3), what fraction of a questions gold chunks appeared in results
+def recall_at_k(retrived_ids, gold_ids, k=3):
+    appeared = [1 if id in gold_ids else 0 for id in retrived_ids[:k]]
+    count = sum(appeared)
+    recall = count / len(gold_ids)
+    return recall
+
+
+
+def main():
+    model = SentenceTransformer(
+        "BAAI/bge-small-en-v1.5",
+        device="mps",
+        local_files_only=True,
+    )
+
+    eval_set, chunks = prepare_experiment()
+
+    question = "what makes a set of vectors a basis?"
+
+    embeddings = embed_chunks(chunks, model)
+
+    k = 3
+
+    recall_scores = []
+
+    for question in eval_set['questions']:
+        if question['score_retrieval'] == False:
+            continue
+        q = question['question'] # the acutal question text
+        retrived_ids = retrive(q, chunks, embeddings, model, k)
+        gold_ids = question['gold_chunk_ids']
+        recall = recall_at_k(retrived_ids, gold_ids, k)
+        recall_scores.append(recall)
+        # inspect misses
+        if (recall < 1):
+            print(f'question: {q}, retrived ids: {retrived_ids}, gold ids: {gold_ids} \n')
+
+        # print(f'{q}, top 3 retrived ids: {top_k_match_ids}, gold chunk ids: {question['gold_chunk_ids']}')
+
+    avg_recall_at_k = sum(recall_scores) / len(recall_scores)
+
+    print(f"average recall@3: {avg_recall_at_k}")
+    
+
+main()
