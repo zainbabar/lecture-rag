@@ -1,66 +1,89 @@
 # Lecture RAG
 
-A RAG study assistant over MATH 235 notes. We will compare dense, BM25, and hybrid retrieval, measure their results, then add grounded answers and a LangGraph workflow.
+A study assistant over my MATH 235 lecture notes. It retrieves relevant passages, sends them to a local LLM, and asks for an answer with chunk-ID citations or an abstention if the notes aren't enough.
 
-Corpus conversion, chunking, searchable-text assembly, and eval plumbing are ready. There are no embeddings, retrievers, metric implementations, or measured retrieval results yet.
+I'm building this to learn how to measure and debug RAG. Dense search, BM25, weighted hybrid search, and a baseline answer flow work. LangGraph is next, once there's a failure that gives it a reason to exist.
 
-## Setup and checks
+## Results so far
 
-Uses Python 3.12, `uv`, and a local `.venv`:
+The experiment searches **75 numbered chunks from Lectures 1–7**, using 30 development questions: 28 answerable and two unanswerable.
+
+| Retriever | Recall@1 | Recall@3 | Recall@5 |
+| --- | ---: | ---: | ---: |
+| Dense | 60.7% | 76.2% | 84.5% |
+| BM25 | 26.8% | 46.4% | 55.4% |
+| Hybrid, equal weights | 41.1% | 70.8% | 90.5% |
+| Hybrid, 75% dense weight | 44.6% | 70.8% | 91.7% |
+
+These are October 10 local results. The 75% dense-weight hybrid was rerun on the GX10 on October 11 and reproduced the same numbers. Recall is computed per question, then averaged over the 28 answerable questions.
+
+Dense ranks the direct answer better near the top. Hybrid finds more labelled evidence within five results, but sometimes pushes related passages above the answer. BM25 uses lowercase + whitespace tokenization, so punctuation and math notation can make matching brittle.
+
+I tuned weights on this development set. These aren't held-out results, and gold IDs are designated evidence targets rather than an exhaustive list of every valid passage. Retrieval recall also doesn't measure whether the generated answer is correct.
+
+## Baseline answers
+
+The first 30-answer run was manually checked against the retrieved chunk texts:
+
+- Both unanswerable questions triggered abstention.
+- One answerable question, Q13, also triggered abstention: search missed the definition of `[v]_B` and basis reordering.
+- Every source ID mentioned in an answer was retrieved, but nine answers used plain IDs rather than the requested bracket citations.
+- Q18 added an explanation absent from its evidence. Q29 needed to state explicitly that coordinate entries depend on an ordered basis.
+
+That's a manual review of this development set, not an answer-accuracy score or a held-out result.
+
+## Run it
+
+Python 3.12, [uv](https://docs.astral.sh/uv/), and Ollama. The current machine is a GX10 with an NVIDIA GB10 GPU; embedding setup also supports CPU and Apple Silicon.
 
 ```sh
 uv sync --locked
 uv run python prepare.py
 uv run pytest -q
+uv run ruff check .
 ```
 
-Dependencies are locked in `uv.lock`: NumPy for vector search, rank-bm25 for the sparse baseline, langgraph/langchain-core for later work, pytest/Ruff for checks, and PyMuPDF for source review. No embedding model or LLM provider has been chosen.
-
-## How the files connect
-
-1. `lecture-pdfs/` holds the unchanged originals. `lectures/` holds their reviewed Markdown conversions: 11 lectures and three practice files. Local conversion helpers are excluded from Git.
-2. `chunk.py` splits numbered units into dictionaries with original text, metadata, stable IDs, a context prefix, and preserved intro text. `add_search_text` adds a separate field without changing the body.
-3. `search_context.json` holds reviewed assumptions: the course's R/C field convention and `dim(V)=n` for the Lecture 6 units that need it. We don't automatically paste the whole intro into each chunk.
-4. `prepare.py` reads the eval file's explicit corpus list, chunks those files, adds searchable text, filters intro entries, and validates IDs. The current experiment uses 75 numbered units in Lectures 1–7. It never indexes the eval answers.
-5. `evaluation/retrieval-eval-set.json` holds 30 development questions and gold IDs: 28 answerable, two unanswerable. See `evaluation/README.md` for the readable version. The original nine-question seed set is preserved separately.
-6. `evaluate.py` accepts a retriever, passes each question to it, checks the returned IDs, and saves rankings. Optional user-written metric functions provide scores. It does not implement retrieval or recall/MRR itself.
-
-`search_text` is: context prefix + field convention + relevant unit assumptions + original body. IDs and metadata remain separate fields. Intro entries aren't indexed independently. Stable IDs describe the source unit; content fingerprints detect changes to the experiment inputs.
-
-## Prepare the inputs
+Download the embedding model once into the project cache:
 
 ```sh
-uv run python prepare.py
-uv run python prepare.py --output artifacts/chunks.json
+uv run python -c 'from dense import EMBEDDING_MODEL, MODEL_CACHE; from sentence_transformers import SentenceTransformer; SentenceTransformer(EMBEDDING_MODEL, cache_folder=str(MODEL_CACHE))'
 ```
 
-The export preserves chunk order and metadata for linking future embedding rows back to chunks. Generated artifacts are ignored by Git. The original seed experiment is also available:
+The scripts load the cached model without downloading it again. Sentence Transformers picks the device automatically; set `LECTURE_RAG_DEVICE=cpu`, `cuda`, or `mps` to override it.
 
 ```sh
-uv run python prepare.py --dataset evaluation/retrieval-check-set.json
+uv run python dense.py
+uv run python sparse.py
+uv run python hybrid.py
 ```
 
-## Plug in a retriever later
+These print Recall@1, @3, and @5. Hybrid fuses ten candidates from each retriever with a dense weight of 0.75 and RRF constant of 60. Embeddings and BM25 are built once per run; embeddings aren't persisted yet.
 
-A retriever module supplies `build_retriever(chunks)`, returning a function `search(question, k)` that returns up to `k` unique chunk ID strings, best first. Build the index once in the factory; questions never receive gold labels.
-
-Once that module exists:
+For generation, start Ollama and download the model:
 
 ```sh
-uv run python evaluate.py --retriever dense:build_retriever --output artifacts/dense-rankings.json
+ollama serve
+# in another terminal; skip serve if Ollama is already running
+ollama pull qwen3.6:35b-a3b
+uv run python rag.py --output artifacts/baseline-answers.json
 ```
 
-`dense.py` does not exist yet. Later, `--metrics metrics:build_metrics` can supply named functions with the signature `(ranked_ids, gold_ids, k) -> float`. Without metrics, the runner saves rankings only. Unanswerable questions remain in the report but are excluded from retrieval metric averages.
+`rag.py` answers all 30 questions and saves JSON with the answers, full retrieved passages, settings, and corpus/dataset fingerprints. The prompt requires evidence-only answers and citations, but those rules still need checking. Set `OLLAMA_URL` to override the default `http://127.0.0.1:11434/api/chat` endpoint.
 
-The seed set keeps its original primary-source targets. Expanded multi-source questions list all designated evidence chunks. These are development labels, not exhaustive relevance judgments or a held-out test set. Record label changes before comparisons; don't claim generalization from repeated tuning on these questions.
+Generation uses `think=False`, `stream=False`, temperature 0, and `num_batch=2048`. The batch setting works around a reproducible CUDA crash with longer prompts on this GB10. The original failing request passed twice from fresh model loads after that change; see the [upstream report](https://github.com/ollama/ollama/issues/17434). The exact kernel failure hasn't been diagnosed here.
 
-## Supporting files
+## Code and data
 
-- `tests/test_plumbing.py` checks scope, body preservation, gold IDs, and runner boundaries; it doesn't test search quality.
-- `docs/corpus-audit.md` records conversion corrections and unresolved source issues.
+- `chunk.py` / `prepare.py`: split numbered lecture units, attach source metadata and checked assumptions, validate the corpus and labels.
+- `dense.py` / `sparse.py` / `hybrid.py`: NumPy cosine ranking, BM25, and weighted reciprocal rank fusion.
+- `rag.py`: collect evidence, build the prompt, call Ollama, and export answers.
+- `evaluate.py`: reusable ranking/metric runner. The retrieval scripts still use their own eval loops.
+- `evaluation/`: development questions and labels, plus the original nine-question check set.
+- `tests/`: corpus/eval wiring and mocked generation requests. These don't measure answer quality.
+- `lectures/` / `lecture-pdfs/`: converted notes and original source PDFs. The full conversion has 11 lectures and three practice files; only Lectures 1–7 are indexed.
 
-The tests check preparation and runner behavior. They are not a retrieval benchmark or proof that the math contains no mistakes.
+Each chunk keeps its original body and a `search_text` containing the lecture prefix, reviewed assumptions, and body. Lecture intros, trailing Source checks, practice files, and eval material stay out of the index. Source corrections and unresolved issues are recorded in each lecture's Source checks section.
 
 ## Next
 
-Choose an embedding model, implement NumPy cosine ranking, then add retrieval metrics.
+Inspect Q13's dense, BM25, and hybrid rankings to find where the coordinate definition gets lost. MRR, held-out questions, and measured LangGraph comparisons are still pending.

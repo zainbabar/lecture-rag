@@ -1,10 +1,7 @@
-# Local corpus conversion/review helpers
-/scripts/pdf_pages.py
-/scripts/check_corpus.py
+# Local conversion tools and working notes
+/scripts/
 /check
-
-# Working roadmap
-/docs/ideas.md
+/docs/
 
 # Local environments and credentials
 .venv/
