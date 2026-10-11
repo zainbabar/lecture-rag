@@ -75,4 +75,4 @@ Let `T:V→W` be linear; the spaces need not be finite-dimensional. Prove that `
 
 ## Source checks
 
-No mathematical discrepancy was found in this lecture during the 2026-10-08 audit. Ordered bases use parentheses here to make their ordering explicit; the PDF also allows braces with the order understood. The coordinate tuple in Example 11.5 and the maps in Exercise 11.13 were checked against rendered pages.
+The source check on 2026-10-08 found no mathematical discrepancies. Ordered bases use parentheses here to make their ordering explicit; the PDF also allows braces with the order understood. The coordinates in Example 11.5 and maps in Exercise 11.13 were checked against the PDF pages.

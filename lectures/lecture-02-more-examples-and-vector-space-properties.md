@@ -63,4 +63,4 @@ The lecture calls `F^n`, `P(F)`, `P_n(F)`, `M_(m×n)(F)`, and `C([0,1])` its com
 
 ## Source checks
 
-On PDF p. 6, one expanded expression for `q(x)` appears to start with `b_1 + b_1 x` after previously defining its constant coefficient as `b_0`. This note uses the coefficient-indexed definition and does not rely on that inconsistent expansion.
+On PDF p. 6, one expanded expression for `q(x)` appears to start with `b_1 + b_1 x` after previously defining its constant coefficient as `b_0`. The notes use `b_0` as the constant coefficient, following the definition.

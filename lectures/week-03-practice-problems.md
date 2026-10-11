@@ -35,6 +35,6 @@ Let `T:V→W` be linear; the spaces need not be finite-dimensional. Choose disti
 
 ## Source checks
 
-No mathematical discrepancy was found in these questions during the 2026-10-08 page-by-page audit. P6 explicitly requires distinct image vectors in part 1; this condition was preserved. Plain-text notation replaces the earlier LaTeX formatting.
+The page-by-page check on 2026-10-08 found no mathematical discrepancies. P6 requires distinct image vectors in part 1, as stated above. Plain-text notation replaces the earlier LaTeX formatting.
 
-P4 repeats Week 2 P7 with column-vector notation. At `x=1`, all three displayed vectors are equal. A literal set removes repetitions, whereas an indexed three-vector family retains them; clarify which meaning is intended before using that case as a gold label.
+P4 repeats Week 2 P7 with column-vector notation. At `x=1`, all three displayed vectors are equal. A literal set removes repetitions, whereas an indexed three-vector family retains them; check which meaning is intended before using that case as a gold label.

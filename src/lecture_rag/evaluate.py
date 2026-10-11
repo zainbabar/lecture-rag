@@ -6,7 +6,7 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 
-from prepare import DEFAULT_CONTEXT, DEFAULT_DATASET, fingerprint, prepare_experiment
+from .prepare import DEFAULT_CONTEXT, DEFAULT_DATASET, fingerprint, prepare_experiment
 
 # the retriever only sees the question + k; gold IDs never go into search
 Retriever = Callable[[str, int], list[str]]
@@ -52,7 +52,7 @@ def run_evaluation(
             }
         )
 
-    # metric functions do the maths; this just averages per-question scores
+    # average each metric across the answerable questions
     scored = [row for row in rows if row["answerable"]]
     means = (
         {name: sum(row["scores"][name] for row in scored) / len(scored) for name in (metrics or {})}

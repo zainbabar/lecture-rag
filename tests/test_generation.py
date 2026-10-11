@@ -6,11 +6,11 @@ from urllib.error import HTTPError
 
 import pytest
 
-from rag import generate_answer
+from lecture_rag.rag import generate_answer
 
 
 def test_batch_export_preserves_evidence(monkeypatch, tmp_path):
-    import rag
+    from lecture_rag import rag
 
     question = {"id": "Q01", "question": "What is a vector space?"}
     chunks = [{"id": "lecture-01-unit-1.1", "search_text": "Vector space axioms."}]
@@ -61,7 +61,7 @@ def test_request_and_completed_answer(monkeypatch):
             ).encode()
         )
 
-    monkeypatch.setattr("rag.urllib.request.urlopen", respond)
+    monkeypatch.setattr("lecture_rag.rag.urllib.request.urlopen", respond)
     assert generate_answer(question, passages, "http://localhost/api/chat").endswith(
         "[lecture-01-unit-1.1]."
     )
@@ -77,7 +77,7 @@ def test_server_error_keeps_ollama_detail(monkeypatch):
             io.BytesIO(b'{"error":"CUDA illegal memory access"}'),
         )
 
-    monkeypatch.setattr("rag.urllib.request.urlopen", fail)
+    monkeypatch.setattr("lecture_rag.rag.urllib.request.urlopen", fail)
     with pytest.raises(RuntimeError, match="Ollama HTTP 500:.*CUDA illegal memory access"):
         generate_answer({"question": "Hello"}, [], "http://localhost/api/chat")
 
@@ -92,7 +92,7 @@ def test_server_error_keeps_ollama_detail(monkeypatch):
 )
 def test_unfinished_or_empty_answers_are_errors(monkeypatch, response):
     monkeypatch.setattr(
-        "rag.urllib.request.urlopen",
+        "lecture_rag.rag.urllib.request.urlopen",
         lambda request, timeout: io.BytesIO(json.dumps(response).encode()),
     )
     with pytest.raises(RuntimeError):

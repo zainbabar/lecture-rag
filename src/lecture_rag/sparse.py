@@ -1,7 +1,7 @@
 import numpy as np
 import rank_bm25
 
-from prepare import prepare_experiment
+from .prepare import prepare_experiment
 
 
 def tokenize_chunks(chunks):

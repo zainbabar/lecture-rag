@@ -77,5 +77,5 @@ Composition may be written `SR` instead of `S∘R`, with `S(R(u))=SRu`, and call
 
 ## Source checks
 
-- On PDF p. 15, Example 8.5 prints a differentiation sum with terms `ka_kx^k`. Differentiating `a_kx^k` gives `ka_kx^{k-1}`. This note records the map `D(p)=p'` and does not reproduce the inconsistent expansion as a valid formula.
-- On PDF p. 17, the proof of Proposition 8.12 repeats `α_1` as the coefficient of its last basis vector in one line; the next line uses `α_n`. This note uses indexed sums to express the proof's intended argument.
+- On PDF p. 15, Example 8.5 prints a differentiation sum with terms `ka_kx^k`. Differentiating `a_kx^k` gives `ka_kx^{k-1}`. The notes use `D(p)=p'` and leave out the incorrect expansion.
+- On PDF p. 17, the proof of Proposition 8.12 repeats `α_1` as the coefficient of its last basis vector in one line; the next line uses `α_n`. The notes use indexed sums for this argument.

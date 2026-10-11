@@ -52,4 +52,4 @@ Show that `{1,1+x,1+x+x^2}` is a basis for `P_2(F)`.
 
 ## Source checks
 
-The proof of Lemma 5.2 on PDF p. 12 has inconsistent subscripts in the sentence describing the nontrivial solution: it names `β_1,...,β_n` although there are `k` unknowns. The note states the system by its correct index ranges and leaves the printed inconsistency recorded here.
+The proof of Lemma 5.2 on PDF p. 12 has inconsistent subscripts in the sentence describing the nontrivial solution: it names `β_1,...,β_n` although there are `k` unknowns. The notes use the correct index ranges.

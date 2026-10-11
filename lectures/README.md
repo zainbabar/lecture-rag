@@ -14,12 +14,12 @@ These Markdown files cover all eleven lectures in the four Section 002 Week 1–
 - Week 4, pp. 8–12: [Lecture 10](lecture-10-the-rank-nullity-theorem.md)
 - Week 4, pp. 13–17: [Lecture 11](lecture-11-isomorphisms-between-vector-spaces.md)
 
-The PDFs' [Week 2 practice problems](week-02-practice-problems.md), [Week 3 practice problems](week-03-practice-problems.md), and [Week 4 practice problems](week-04-practice-problems.md) are separate files because they are not numbered lectures. Week 1 has no separate practice-problem section.
+The [Week 2](week-02-practice-problems.md), [Week 3](week-03-practice-problems.md), and [Week 4](week-04-practice-problems.md) practice problems have their own files. Week 1 has no separate practice section.
 
-Each lecture file is a **structured set of notes**, not a verbatim transcription. All 125 numbered definitions, propositions, lemmas, theorems, corollaries, remarks, examples, and exercises have individual `##` headings and page references. Some derivations and repeated prose are condensed. Every file ends with `## Source checks`, which is conversion commentary and must be excluded from the index. Mathematical notation and source discrepancies were checked against extracted text and rendered pages on 2026-10-08. Source discrepancies are recorded in each file's Source checks section.
+The notes summarize the PDFs, with some derivations and repeated prose shortened. All 125 numbered units have their own `##` headings and page references. The notation was checked against extracted PDF text and page images on 2026-10-08. Each file ends with `## Source checks`, recording source errors and conversion issues. Keep that section out of the index.
 
-The lecture files use plain Markdown and compact text notation instead of LaTeX. `F` means `R` or `C`; `P_n(F)` is the polynomial space of degree at most `n`; `M_(m×n)(F)` is the space of `m` by `n` matrices. A matrix written `[[a, b], [c, d]]` has rows `[a, b]` and `[c, d]`. This notation is meant to be readable in the source text as well as in a rendered Markdown view.
+Math uses plain-text notation: `F` means `R` or `C`, `P_n(F)` contains polynomials of degree at most `n`, and `M_(m×n)(F)` contains `m` by `n` matrices. In `[[a, b], [c, d]]`, each inner list is a row.
 
-The practice files use the same plain-text notation and contain 20 questions, each with a heading and source pages. **Week 4 P3 is false as printed and needs clarification**; its statement is preserved with a warning and is not a verified mathematical claim.
+The practice files contain 20 questions, each with a heading and source pages. Week 4 P3 is false as printed. Its statement and the missing hypothesis are discussed in that file's Source checks.
 
-For the existing retrieval check set, search only the seven `lecture-01` through `lecture-07` files. Lectures 8–11 are converted and available but are not silently added to that evaluation scope. Exclude practice files, this README, and evaluation/reference notes. Before assigning gold chunk IDs, verify that the resulting chunk contains the expected evidence; a checked source page alone does not validate future chunk boundaries.
+The current eval searches the seven `lecture-01` through `lecture-07` files. Lectures 8–11, practice problems, READMEs, and eval notes stay outside that corpus. When assigning a gold ID, check the chunk itself for the expected evidence as well as its source page.

@@ -32,10 +32,7 @@ def chunk_markdown(path: Path) -> list[dict]:
 
     # pull apart headings like '## Proposition 3.4 — Subspace test (pp. 2–3)'
     # we want: type, number, title, first page, last page
-    # \w+ = a word, \d+ = digits, .+ = the title text
     # pp? handles both p. and pp.; the last page is optional
-    # the (...) groups are what we get back from match.groups()
-    # \. means an actual dot, since a plain dot has a special meaning in regex
     heading_pattern = (
         r"## (\w+) (\d+\.\d+) — (.+) "
         r"\(pp?\. (\d+)(?:[–-](\d+))?\)"
@@ -144,8 +141,8 @@ def chunk_markdown(path: Path) -> list[dict]:
 
 
 def chunk_files() -> tuple[list[dict], list[dict]]:
-    """Process lecture files in order; return summaries and the actual chunks."""
-    path = Path("lectures/")
+    """Read lectures in order and return summaries plus chunks."""
+    path = Path(__file__).resolve().parents[2] / "lectures"
     files = list(path.glob("lecture-*.md"))
     files.sort()  # 01, 02, etc. means sorting puts the lectures in order
 
@@ -208,4 +205,3 @@ if __name__ == "__main__":
     summary, chunked_files = chunk_files()
     for lecture_summary in summary:
         print(lecture_summary["file_name"], " empty chunks: ", lecture_summary["empty_chunks"])
-    # print(chunked_files)

@@ -59,6 +59,6 @@ Recall that `L(V,W)`, the set of linear maps `V→W`, is a vector space under po
 
 ## Source checks
 
-- **P3 is false as written.** The zero map is linear and the domain has three-dimensional subspaces, yet the zero map is not surjective onto `P_4(F)`. The source does not connect `U` to `T`. A kernel assumption would explain a rank-nullity argument, but it has not been confirmed and is not inserted into the question.
+- **P3 is false as written.** The zero map is linear and the domain has three-dimensional subspaces, yet the zero map is not surjective onto `P_4(F)`. The source does not connect `U` to `T`. A kernel assumption could make a rank-nullity argument work. That assumption is unconfirmed, so the question keeps the printed wording.
 - On PDF p. 19, P7 refers to “Proposition 8.10” for the vector-space structure of `L(V,W)`. The relevant result is Proposition 8.14 in Week 3; 8.10 is an exercise about differentiation.
-- In P5, `n` is a finite dimension; the printed finite fractions and rank inequalities are retained in that setting.
+- In P5, `n` is a finite dimension; the fractions and rank inequalities are stated for that setting.

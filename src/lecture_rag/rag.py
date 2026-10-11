@@ -9,10 +9,10 @@ import numpy as np
 from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 
-from dense import embed_chunks, load_embedding_model
-from hybrid import hybrid_retrive
-from prepare import fingerprint, prepare_experiment
-from sparse import tokenize_chunks
+from .dense import embed_chunks, load_embedding_model
+from .hybrid import hybrid_retrive
+from .prepare import fingerprint, prepare_experiment
+from .sparse import tokenize_chunks
 
 
 # get the passages we'll give the llm; this doesn't generate an answer yet
@@ -25,7 +25,6 @@ def get_passages(
     dense_weight: float = 0.75,
     k: int = 5,
 ) -> list[dict]:
-    # take a question dict and return passages w/ ids and ranks for the prompt
     # same hybrid search as the retrieval experiment, default is top 5
     top_k_chunk_ids = hybrid_retrive(
         question, chunks, embeddings, dense_model, sparse_model, dense_weight, k
@@ -82,27 +81,27 @@ def generate_answer(question: dict, passages: list[dict], url: str, num_batch: i
         "think": False,
         "stream": False,  # waits till generation finishes then sends back 1 response
         # default batch size crashes on long prompts with this model on our gb10
-        # 2048 works around it; don't shorten the evidence to dodge the crash
+        # 2048 worked on the same prompt after fresh model loads
         # upstream report: https://github.com/ollama/ollama/issues/17434
         "options": {"temperature": 0, "num_batch": num_batch},
     }
 
-    # convert our python dict request to json string and encode it in bytes
+    # send json as bytes
     json_request = json.dumps(request).encode("utf-8")
-    # create the request object w/ headers and data, so it knows what to send and where
+    # tell ollama we're sending json
     req = urllib.request.Request(
         url, data=json_request, headers={"Content-Type": "application/json"}, method="POST"
     )
     try:
-        # send the actual request and get the response
+        # wait for the complete response
         with urllib.request.urlopen(req, timeout=120) as response:
             answer_bytes = response.read()
             answer_text = answer_bytes.decode("utf-8")
 
-            # parse the response, turn it into a a python dict  so we can ascess
+            # parse ollama's json response
             answer_dict = json.loads(answer_text)
     except HTTPError as error:
-        # keep ollama's actual error, rather than just 'HTTP 500'
+        # include ollama's error message so we can see why it failed
         detail = error.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Ollama HTTP {error.code}: {detail}") from error
 
@@ -118,9 +117,8 @@ def generate_answer(question: dict, passages: list[dict], url: str, num_batch: i
 
 
 def answer_question(
-    question, chunks, embeddings,
-    dense_model, sparse_model,
-    url, dense_weight=0.75, k=5) -> tuple[str, list[dict]]:
+    question, chunks, embeddings, dense_model, sparse_model, url, dense_weight=0.75, k=5
+) -> tuple[str, list[dict]]:
 
     passages = get_passages(
         question, chunks, embeddings, dense_model, sparse_model, dense_weight, k

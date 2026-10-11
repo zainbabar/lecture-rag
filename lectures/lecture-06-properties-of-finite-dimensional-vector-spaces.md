@@ -74,6 +74,6 @@ Find a basis and dimension for `{A∈ M_3(F):Tr(A)=0}`.
 
 ## Source checks
 
-- On PDF p. 3, the displayed “remaining” set keeps the matrix just shown to be redundant and omits the first matrix instead. The corrected set `B` above follows the lecture's stated removal argument, as clarified by the user.
+- On PDF p. 3, the displayed “remaining” set keeps the matrix just shown to be redundant and omits the first matrix instead. The corrected set `B` follows the removal argument checked during source review.
 - Proposition 6.6 uses `n` from the lecture's opening assumption `dim(V)=n`.
-- In the proof of Theorem 6.1(i), the PDF says to choose the independent set `T` in Lemma 5.2 to be a basis while discussing a contrapositive. The applicable fact is that a basis is a spanning set of size `n`, so Lemma 5.2 bounds the size of every independent subset by `n`; the proof summary above uses this argument.
+- In the proof of Theorem 6.1(i), the PDF says to choose the independent set `T` in Lemma 5.2 to be a basis while discussing a contrapositive. A basis spans the space with `n` vectors, so Lemma 5.2 bounds every independent subset by `n`. The proof summary uses that argument.

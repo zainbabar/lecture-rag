@@ -62,4 +62,4 @@ Let `F^∞` be all sequences `(x_k)` for `k = 1, 2, ...`, with every `x_k` in `F
 
 ## Source checks
 
-The PDF's dot-product formula on p. 2 is `a_1 b_1 + ... + a_n b_n`. This note preserves that printed formula; it does not substitute the conjugate-symmetric inner product used in some contexts over `C`.
+The PDF's dot-product formula on p. 2 is `a_1 b_1 + ... + a_n b_n`. The notes keep that formula. It has no complex conjugation, unlike the usual complex inner product.

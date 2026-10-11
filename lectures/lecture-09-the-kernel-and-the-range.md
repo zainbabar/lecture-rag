@@ -89,4 +89,4 @@ Recall that `C^1([0,1])` consists of continuously differentiable real-valued fun
 
 ## Source checks
 
-The 2026-10-08 audit found no mathematical transcription discrepancy in this lecture. Example 9.8 explicitly includes zero in `N`. Remark 9.10 and Example 9.12 use informal comparisons of injectivity; they do not assert that a nontrivial kernel still permits injectivity. Column-vector orders in Example 9.11 were checked against the rendered pages.
+The source check on 2026-10-08 found no mathematical transcription errors. Example 9.8 explicitly includes zero in `N`. Remark 9.10 and Example 9.12 use informal comparisons of injectivity; they do not assert that a nontrivial kernel still permits injectivity. The coordinate order in Example 9.11 was checked against the PDF pages.

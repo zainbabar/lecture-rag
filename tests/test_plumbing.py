@@ -3,12 +3,12 @@
 import copy
 import json
 import re
-from chunk import chunk_files
 
 import pytest
 
-from evaluate import run_evaluation
-from prepare import ROOT, load_dataset, prepare_corpus, prepare_experiment
+from lecture_rag.chunk import chunk_files
+from lecture_rag.evaluate import run_evaluation
+from lecture_rag.prepare import ROOT, load_dataset, prepare_corpus, prepare_experiment
 
 
 def test_scope_and_original_bodies():

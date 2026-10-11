@@ -73,4 +73,4 @@ Classify each set as independent or dependent, with justification:
 
 ## Source checks
 
-No mathematical discrepancy was found in this lecture during the 2026-10-08 page-by-page audit. The two polynomial sets on p. 9 both belong to Example 4.9; Examples 4.11 and 4.12 appear after Proposition 4.10 on p. 10. They are kept as separate numbered units here.
+The page-by-page check on 2026-10-08 found no mathematical discrepancies. The two polynomial sets on p. 9 both belong to Example 4.9; Examples 4.11 and 4.12 appear after Proposition 4.10 on p. 10. Each has its own numbered unit.

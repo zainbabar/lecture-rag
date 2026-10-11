@@ -1,10 +1,10 @@
 from rank_bm25 import BM25Okapi
 
-from dense import embed_chunks, load_embedding_model, recall_at_k
-from dense import retrive as dense_retrieve
-from prepare import prepare_experiment
-from sparse import retrive as sparse_retrieve
-from sparse import tokenize_chunks
+from .dense import embed_chunks, load_embedding_model, recall_at_k
+from .dense import retrive as dense_retrieve
+from .prepare import prepare_experiment
+from .sparse import retrive as sparse_retrieve
+from .sparse import tokenize_chunks
 
 
 # combine dense + bm25 using ranks, since their raw scores aren't on the same scale

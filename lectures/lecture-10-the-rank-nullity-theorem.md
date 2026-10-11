@@ -62,6 +62,6 @@ For finite-dimensional `V` and `W`, prove:
 
 ## Source checks
 
-- On PDF p. 8, the proof of Proposition 10.1 calls `{T(v_1),...,T(v_n)}` a spanning set for `W`. The argument only proves it spans `Range(T)`, which is the claim used above. A map need not be surjective.
+- On PDF p. 8, the proof of Proposition 10.1 calls `{T(v_1),...,T(v_n)}` a spanning set for `W`. The argument proves it spans `Range(T)`, as stated in the notes. A map need not be surjective.
 - On PDF p. 9, Example 10.3 prints `Ker(T)={(0,0,1)^T}`, omitting `Span`. The kernel is the whole line `Span({(0,0,1)^T})`, as already established in Example 9.4. The singleton is not a subspace.
-- On PDF p. 11, the coefficient in the preimage polynomial of Example 10.6 is `c/2`. The fraction and coordinate order were verified against the rendered page; raw extraction scrambles them.
+- On PDF p. 11, the coefficient in the preimage polynomial of Example 10.6 is `c/2`. Text extraction scrambles the fraction and coordinate order. Both were checked against the PDF page.

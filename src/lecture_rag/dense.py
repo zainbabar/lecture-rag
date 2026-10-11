@@ -1,13 +1,12 @@
 import os
-from pathlib import Path
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from prepare import prepare_experiment
+from .prepare import ROOT, prepare_experiment
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
-MODEL_CACHE = Path(__file__).resolve().parent / ".cache" / "huggingface"
+MODEL_CACHE = ROOT / ".cache" / "huggingface"
 
 
 def load_embedding_model(device: str | None = None) -> SentenceTransformer:

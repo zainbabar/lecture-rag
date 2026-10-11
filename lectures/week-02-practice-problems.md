@@ -49,6 +49,6 @@ For a real parameter `x`, let `S={(x,1,1),(1,x,1),(1,1,x)}⊆R^3`. Determine whi
 
 ## Source checks
 
-On PDF p. 16, P2 introduces `P_3(R)` but writes `P_3(F)` inside the definitions of `U` and `W`. These notes use the stated real ambient space. All practice questions were checked against their rendered source pages on 2026-10-08 and rewritten in the same plain-text notation as the lectures.
+On PDF p. 16, P2 introduces `P_3(R)` but writes `P_3(F)` inside the definitions of `U` and `W`. These notes use the stated real ambient space. The questions were checked against PDF pages on 2026-10-08 and use the lectures' plain-text notation.
 
-P7 is written as a set. At `x=1`, its three displayed vectors coincide, so the literal set has just one nonzero element. Independence of this set differs from independence of an indexed three-vector family. Preserve the source wording and clarify that convention before using this case in an evaluation question.
+P7 is written as a set. At `x=1`, its three displayed vectors coincide, so the literal set has one nonzero element. Independence of this set differs from independence of an indexed three-vector family. Check which convention is intended before using this case in an eval question.

@@ -58,4 +58,4 @@ Show diagonal matrices `D_n(F)={[a_ij]∈ M_n(F):a_ij=0 for i≠j}` form a subsp
 
 ## Source checks
 
-PDF p. 1 calls the displayed plane “the unique line” through `u` in directions `v,w`. The surrounding definition and figure show a plane; the note above uses “plane” and records the PDF wording here.
+PDF p. 1 calls the displayed plane “the unique line” through `u` in directions `v,w`. The definition and figure show a plane, so the notes use “plane.”

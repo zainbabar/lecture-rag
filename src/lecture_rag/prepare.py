@@ -3,16 +3,17 @@
 import argparse
 import hashlib
 import json
-from chunk import add_search_text, chunk_markdown
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+from .chunk import add_search_text, chunk_markdown
+
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DATASET = ROOT / "evaluation/retrieval-eval-set.json"
 DEFAULT_CONTEXT = ROOT / "search_context.json"
 
 
 def load_dataset(path: Path) -> dict:
-    """Load the questions and catch label/setup mistakes before running search."""
+    """Load questions and check their IDs and labels before search."""
     data = json.loads(path.read_text())
     if data.get("schema_version") != 1:
         raise ValueError("Unsupported eval schema version")
@@ -42,7 +43,7 @@ def load_dataset(path: Path) -> dict:
 def prepare_corpus(
     dataset: dict, root: Path = ROOT, context_path: Path = DEFAULT_CONTEXT
 ) -> list[dict]:
-    """Load the chosen lectures and add checked context to their numbered units."""
+    """Load the selected lectures and add reviewed assumptions to each unit."""
     context = json.loads(context_path.read_text())
     if context.get("schema_version") != 1:
         raise ValueError("Unsupported context schema version")
@@ -77,7 +78,7 @@ def prepare_corpus(
 
 
 def fingerprint(value: object) -> str:
-    # same inputs -> same hash; useful for checking we compared the same experiment
+    # same inputs -> same hash, so we can check what changed between runs
     encoded = json.dumps(value, sort_keys=True, ensure_ascii=False).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 

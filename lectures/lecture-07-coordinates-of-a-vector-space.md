@@ -85,6 +85,6 @@ Decide whether `{1+4x+7x^2, 2+5x+8x^2, 3+6x+9x^2}` is independent in `P_2(F)`.
 
 ## Source checks
 
-- The PDF text extractor scrambles the vertical order of entries in the coordinate columns on p. 8. The rendered PDF is correct; the tuple order used in this note was checked against the rendered page.
-- PDF p. 9 first writes `p(x)=3+3x+5x^3`, then calculates with `3+3x+5x^2`. The user confirmed that `x^3` is a typo and `x^2` is intended. The page also says “write `x`” while working with `p(x)`.
+- The PDF text extractor scrambles the vertical order of entries in the coordinate columns on p. 8. The PDF page shows the correct order, which the notes follow.
+- PDF p. 9 first writes `p(x)=3+3x+5x^3`, then calculates with `3+3x+5x^2`. The reviewed correction uses `x^2`, matching the calculation. The page also says “write `x`” while working with `p(x)`.
 - Example 7.11 uses a different five-matrix set from Example 6.5. Its rank-3 result does not contradict the rank-4 spanning set revisited in Exercise 7.12.
