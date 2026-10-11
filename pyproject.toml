@@ -9,6 +9,7 @@ dependencies = [
     "langchain-core>=1,<2",
     "langgraph>=1,<2",
     "sentence-transformers>=6.1.0",
+    "langchain-ollama>=1.1.0",
 ]
 
 [build-system]

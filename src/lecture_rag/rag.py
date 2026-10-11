@@ -128,6 +128,7 @@ def answer_question(
 
 
 def main() -> None:
+    # pass options to script from terminal, can use this to set custom output path
     parser = argparse.ArgumentParser(description="Generate answers for the development questions.")
     parser.add_argument("--output", type=Path, default=Path("artifacts/baseline-answers.json"))
     args = parser.parse_args()
