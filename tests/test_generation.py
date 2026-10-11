@@ -18,7 +18,7 @@ def test_batch_export_preserves_evidence(monkeypatch, tmp_path):
     output = tmp_path / "results" / "answers.json"
     monkeypatch.setattr("sys.argv", ["rag.py", "--output", str(output)])
     monkeypatch.setattr(rag, "load_embedding_model", lambda: object())
-    monkeypatch.setattr(rag, "prepare_experiment", lambda: ({"questions": [question]}, chunks))
+    monkeypatch.setattr(rag, "prepare_experiment", lambda *args: ({"questions": [question]}, chunks))
     monkeypatch.setattr(rag, "embed_chunks", lambda chunks, model: [])
     monkeypatch.setattr(rag, "BM25Okapi", lambda tokens: object())
     monkeypatch.setattr(rag, "answer_question", lambda *args: ("An answer.", passages))
@@ -26,6 +26,9 @@ def test_batch_export_preserves_evidence(monkeypatch, tmp_path):
     rag.main()
 
     report = json.loads(output.read_text())
+    # timing changes every run, so just check it's there
+    assert isinstance(report["results"][0].pop("seconds"), float)
+    assert isinstance(report["total_seconds"], float)
     assert report["results"] == [
         {
             "question_id": "Q01",

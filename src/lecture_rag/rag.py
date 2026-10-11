@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 import os
 import urllib.request
 from pathlib import Path
@@ -11,7 +12,7 @@ from sentence_transformers import SentenceTransformer
 
 from .dense import embed_chunks, load_embedding_model
 from .hybrid import hybrid_retrive
-from .prepare import fingerprint, prepare_experiment
+from .prepare import DEFAULT_DATASET, fingerprint, prepare_experiment
 from .sparse import tokenize_chunks
 
 
@@ -129,27 +130,34 @@ def answer_question(
 
 def main() -> None:
     # pass options to script from terminal, can use this to set custom output path
-    parser = argparse.ArgumentParser(description="Generate answers for the development questions.")
+    parser = argparse.ArgumentParser(description="Generate answers for an eval set.")
     parser.add_argument("--output", type=Path, default=Path("artifacts/baseline-answers.json"))
+    # swap in evaluation/heldout-eval-set.json for the held-out run
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     args = parser.parse_args()
     dense_model = load_embedding_model()
-    eval_set, chunks = prepare_experiment()
+    eval_set, chunks = prepare_experiment(args.dataset)
     # build both search indexes once, then reuse them for each question
     embeddings = embed_chunks(chunks, dense_model)
     sparse_model = BM25Okapi(tokenize_chunks(chunks))
     url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
     # only the question text goes into search, not its gold labels
     answers = []
+    run_start = time.perf_counter()
     for question in eval_set["questions"]:
+        # perf_counter is a stopwatch, only differences between two calls mean anything
+        start = time.perf_counter()
         answer, passages = answer_question(
             question, chunks, embeddings, dense_model, sparse_model, url
         )
+        seconds = time.perf_counter() - start  # whole question, all llm calls included
         answers.append(
             {
                 "question_id": question["id"],
                 "question_text": question["question"],
                 "answer": answer,
                 "retrieved_passages": passages,
+                "seconds": round(seconds, 2),
             }
         )
         print(f"{question['id']}: done", flush=True)
@@ -164,6 +172,7 @@ def main() -> None:
         "k": 5,
         "corpus_fingerprint": fingerprint(chunks),
         "dataset_fingerprint": fingerprint(eval_set),
+        "total_seconds": round(time.perf_counter() - run_start, 2),
         "results": answers,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

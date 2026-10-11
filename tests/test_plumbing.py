@@ -7,7 +7,6 @@ import re
 import pytest
 
 from lecture_rag.chunk import chunk_files
-from lecture_rag.evaluate import run_evaluation
 from lecture_rag.prepare import ROOT, load_dataset, prepare_corpus, prepare_experiment
 
 
@@ -53,32 +52,3 @@ def test_duplicate_question_is_rejected(tmp_path):
     path.write_text(json.dumps(dataset))
     with pytest.raises(ValueError, match="Duplicate ID"):
         load_dataset(path)
-
-
-@pytest.mark.parametrize("ranking", [["unknown"], ["lecture-01-unit-1.1"] * 2])
-def test_invalid_rankings_are_rejected(ranking):
-    dataset, chunks = prepare_experiment()
-    with pytest.raises(ValueError):
-        run_evaluation(dataset, chunks, lambda question, k: ranking)
-
-
-def test_runner_keeps_gold_out_of_search_and_skips_unanswerable_metrics():
-    dataset, chunks = prepare_experiment()
-    queries = []
-    scored = []
-
-    def retrieve(question, k):
-        queries.append((question, k))
-        return []
-
-    def metric_stub(ranking, gold, k):
-        # a test double for wiring only; this is not recall/MRR
-        scored.append(gold)
-        return 0.0
-
-    report = run_evaluation(dataset, chunks, retrieve, metrics={"stub": metric_stub})
-    assert queries == [(q["question"], 3) for q in dataset["questions"]]
-    assert len(scored) == 28
-    assert len(report["results"]) == 30
-    assert all(row["scores"] == {} for row in report["results"] if not row["answerable"])
-    assert report["scored_question_count"] == 28

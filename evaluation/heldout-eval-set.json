@@ -1,0 +1,406 @@
+{
+  "schema_version": 1,
+  "name": "Lectures 1–7 held-out eval v1",
+  "labelled_on": "2026-10-11",
+  "corpus": {
+    "files": [
+      "lectures/lecture-01-introduction-to-vector-spaces.md",
+      "lectures/lecture-02-more-examples-and-vector-space-properties.md",
+      "lectures/lecture-03-subspaces.md",
+      "lectures/lecture-04-span-and-linear-independence.md",
+      "lectures/lecture-05-bases-and-dimension.md",
+      "lectures/lecture-06-properties-of-finite-dimensional-vector-spaces.md",
+      "lectures/lecture-07-coordinates-of-a-vector-space.md"
+    ],
+    "exclude_chunk_types": [
+      "intro"
+    ]
+  },
+  "scoring": {
+    "k": 5,
+    "policy": "Same scoring as the development set. Answerable questions are scored on their gold IDs; unanswerables stay out of retrieval metrics and are used for abstention checks."
+  },
+  "label_notes": [
+    "Written on 2026-10-11 after the dense weight, k, prompts, and rewrite step were fixed. Nothing was tuned on these questions.",
+    "Gold chunks were picked mostly from units not used as gold in the development set, so the questions don't repeat dev questions.",
+    "H09 deliberately avoids the phrase 'coordinate vector', like dev Q13.",
+    "H15 and H16 cover Lectures 9 and 10, which exist in lectures/ but are outside the index.",
+    "Gold IDs are designated evidence targets, not exhaustive relevance judgments. These labels have had one review pass so far."
+  ],
+  "questions": [
+    {
+      "id": "H01",
+      "title": "Can a subspace of a 5-dimensional space have more than 5 dimensions, and when is its dimension exactly 5",
+      "question": "Can a subspace of a 5-dimensional space have more than 5 dimensions, and when is its dimension exactly 5?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Subspaces of an n-dimensional space have dimension at most n, with equality exactly when U=V.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            3,
+            4
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H02",
+      "title": "Over Z/3Z, x^3 - x is zero at every element. Does that make it the zero polynomial",
+      "question": "Over Z/3Z, x^3 - x is zero at every element. Does that make it the zero polynomial?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Polynomials are formal expressions, not the functions they induce.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            7,
+            8
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H03",
+      "title": "How do the notes show that {1, 1+x, x+x^2} spans P_2(F)",
+      "question": "How do the notes show that {1, 1+x, x+x^2} spans P_2(F)?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Explicit coefficients writing any a0+a1x+a2x^2 in terms of the set.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H04",
+      "title": "Why do two bases of the same vector space always have the same number of vectors",
+      "question": "Why do two bases of the same vector space always have the same number of vectors?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.4"
+      ],
+      "supporting_chunk_ids": [
+        "lecture-05-unit-5.2"
+      ],
+      "score_retrieval": true,
+      "rationale": "Theorem 5.4 applies Lemma 5.2 in both directions.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            13
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H05",
+      "title": "Why is {(1,0)^T, (1,1)^T, (1,-1)^T} dependent in F^2",
+      "question": "Why is {(1,0)^T, (1,1)^T, (1,-1)^T} dependent in F^2?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.11"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "(1,0)^T is half of each of the other two summed.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.11",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            10
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H06",
+      "title": "Can a set that only contains the zero vector ever be linearly independent",
+      "question": "Can a set that only contains the zero vector ever be linearly independent?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.12"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "1·0=0 is a nontrivial relation, so {0} is dependent.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.12",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            10
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H07",
+      "title": "In the five-matrix spanning set of M_2(F), which matrix is thrown out to get a basis, and what combination shows it's redundant",
+      "question": "In the five-matrix spanning set of M_2(F), which matrix is thrown out to get a basis, and what combination shows it's redundant?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.5"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "A_2=(1/3)A_1+(2/3)A_4-(2/3)A_3; removing A_2 leaves a basis.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            3
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H08",
+      "title": "What are U_n(F) and D_n(F), and why is each one a subspace of M_n(F)",
+      "question": "What are U_n(F) and D_n(F), and why is each one a subspace of M_n(F)?",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.8",
+        "lecture-03-unit-3.11"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Upper triangular example and diagonal exercise; both need separate evidence.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            4
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        },
+        {
+          "chunk_id": "lecture-03-unit-3.11",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H09",
+      "title": "If I turn every vector in my set into a column of numbers using a basis, can I check spanning and independence with row reduction instead",
+      "question": "If I turn every vector in my set into a column of numbers using a basis, can I check spanning and independence with row reduction instead?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.9"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Coordinates preserve span and independence; the wording avoids 'coordinate vector' on purpose.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.9",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            10
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H10",
+      "title": "Why is {1-x-x^2, 2+3x+4x^2, 5-2x+x^2} linearly independent",
+      "question": "Why is {1-x-x^2, 2+3x+4x^2, 5-2x+x^2} linearly independent?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.10"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Coordinate matrix has rref I_3, rank 3.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.10",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            10,
+            11
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H11",
+      "title": "Are continuous functions on [0,1] a vector space, and what's the zero vector there",
+      "question": "Are continuous functions on [0,1] a vector space, and what's the zero vector there?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.5"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Pointwise operations; zero is the constant zero function.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H12",
+      "title": "What's the shortened one-condition subspace test, and how does it show a line through the origin in R^n is a subspace",
+      "question": "What's the shortened one-condition subspace test, and how does it show a line through the origin in R^n is a subspace?",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.5",
+        "lecture-03-unit-3.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Concise test plus the line/plane example that applies it.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            3
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        },
+        {
+          "chunk_id": "lecture-03-unit-3.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            3
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H13",
+      "title": "What are the standard ordered bases for F^n, P_n(F), and M_(m×n)(F)",
+      "question": "What are the standard ordered bases for F^n, P_n(F), and M_(m×n)(F)?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Remark 7.3 lists all three, with E_ij in lexicographic order.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08. Pages for 2.4, 2.5, 4.11, 6.5, and 7.10 were rechecked against the PDF text on 2026-10-11."
+        }
+      ]
+    },
+    {
+      "id": "H14",
+      "title": "How does the Gram-Schmidt process turn a basis into an orthonormal one",
+      "question": "How does the Gram-Schmidt process turn a basis into an orthonormal one?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Inner products and orthogonality are outside Lectures 1–7.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "H15",
+      "title": "How do I find the kernel of a linear map",
+      "question": "How do I find the kernel of a linear map?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Kernels are in Lecture 9, which is outside the indexed corpus.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "H16",
+      "title": "What does the rank-nullity theorem say",
+      "question": "What does the rank-nullity theorem say?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Rank-nullity is in Lecture 10, which is outside the indexed corpus.",
+      "required_context": null,
+      "verification": []
+    }
+  ]
+}
