@@ -1,0 +1,961 @@
+{
+  "schema_version": 1,
+  "name": "Lectures 1–7 test set v1",
+  "labelled_on": "2026-10-12",
+  "corpus": {
+    "files": [
+      "lectures/lecture-01-introduction-to-vector-spaces.md",
+      "lectures/lecture-02-more-examples-and-vector-space-properties.md",
+      "lectures/lecture-03-subspaces.md",
+      "lectures/lecture-04-span-and-linear-independence.md",
+      "lectures/lecture-05-bases-and-dimension.md",
+      "lectures/lecture-06-properties-of-finite-dimensional-vector-spaces.md",
+      "lectures/lecture-07-coordinates-of-a-vector-space.md"
+    ],
+    "exclude_chunk_types": [
+      "intro"
+    ]
+  },
+  "scoring": {
+    "k": 5,
+    "policy": "Same scoring as the dev and held-out sets. Unanswerables stay out of retrieval metrics and are used for abstention checks."
+  },
+  "label_notes": [
+    "Frozen test set. Don't look at per-question results while changing the system; run it once per finished change and report the totals.",
+    "Written after the dev and held-out results were known. Gold chunks cover most units that neither earlier set uses; several 'Which exercise...' questions test lookup only, since the notes state exercises without solutions.",
+    "T35–T40 are unanswerable. T36 and T37 are covered in Lectures 8 and 11, which exist in lectures/ but are outside the index. T40 is a near miss: Lecture 7 covers coordinates but not change-of-basis matrices.",
+    "Gold IDs are designated evidence targets, not exhaustive relevance judgments."
+  ],
+  "questions": [
+    {
+      "id": "T01",
+      "title": "What does u - v mean in a general vector space",
+      "question": "What does u - v mean in a general vector space?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Subtraction is defined as u+(-v).",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            3
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "What's the zero vector in F^n, and which axioms does the lecture check by hand in F^2",
+      "question": "What's the zero vector in F^n, and which axioms does the lecture check by hand in F^2?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Zero is (0,...,0)^T; A1 and M1 are verified in F^2.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            3,
+            4
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "How do you add two matrices and scale one in M_(m×n)(F)",
+      "question": "How do you add two matrices and scale one in M_(m×n)(F)?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.5"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Entry-wise operations.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "Which exercise asks me to prove the space of infinite sequences is a vector space",
+      "question": "Which exercise asks me to prove the space of infinite sequences is a vector space?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 1.6, F^∞.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "What do I get if I add 1 - 2x + 3x^2 and -2 + 4x - x^2 + 7x^3",
+      "question": "What do I get if I add 1 - 2x + 3x^2 and -2 + 4x - x^2 + 7x^3?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Worked sum in Example 2.2.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            6,
+            7
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "Do polynomials of degree at most n form a vector space on their own",
+      "question": "Do polynomials of degree at most n form a vector space on their own?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "P_n(F) is a vector space under P(F)'s operations.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "What is the smallest possible vector space, and how do its operations work",
+      "question": "What is the smallest possible vector space, and how do its operations work?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "The zero vector space; wording avoids 'zero vector space'.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Which exercise has me prove that 0 times any vector is the zero vector and that (-1)v = -v",
+      "question": "Which exercise has me prove that 0 times any vector is the zero vector and that (-1)v = -v?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.9"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 2.9.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.9",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            9
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "Is P_2(F) a subspace of P_5(F)",
+      "question": "Is P_2(F) a subspace of P_5(F)?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "P_m is a subspace of P_n for m ≤ n.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            2
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "Which two subspaces does every vector space automatically have",
+      "question": "Which two subspaces does every vector space automatically have?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "{0} and V itself.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            2
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "What three things do I have to check to show a subset is a subspace",
+      "question": "What three things do I have to check to show a subset is a subspace?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.4"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Nonempty, closed under addition, closed under scalar multiplication.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.4",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            2,
+            3
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "Are functions with continuous derivatives on [0,1] a subspace of the continuous functions",
+      "question": "Are functions with continuous derivatives on [0,1] a subspace of the continuous functions?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.9"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "C^1([0,1]) is a subspace of C([0,1]).",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.9",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            4,
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "Which exercise asks whether the even-degree polynomials together with zero form a subspace",
+      "question": "Which exercise asks whether the even-degree polynomials together with zero form a subspace?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-03-unit-3.10"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 3.10.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-03-unit-3.10",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T14",
+      "title": "If S is infinite, what does Span(S) mean",
+      "question": "If S is infinite, what does Span(S) mean?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "All finite linear combinations.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            6
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T15",
+      "title": "How do the notes describe a plane through the origin using span",
+      "question": "How do the notes describe a plane through the origin using span?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Span({v,w}) with v not in Span({w}).",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T16",
+      "title": "What does it mean for a set S to span V",
+      "question": "What does it mean for a set S to span V?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.5"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Span(S)=V.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T17",
+      "title": "Why is {1, 3x, 1-2x, 4x^2-2x+1} dependent",
+      "question": "Why is {1, 3x, 1-2x, 4x^2-2x+1} dependent?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.9"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Coefficients (1,-2/3,-1,0) give a nontrivial zero combination.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.9",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            9
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T18",
+      "title": "Which exercise asks me to classify {(1,-2)^T, (4,-6)^T} as independent or dependent",
+      "question": "Which exercise asks me to classify {(1,-2)^T, (4,-6)^T} as independent or dependent?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-04-unit-4.13"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 4.13 part 1.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-04-unit-4.13",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            10
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T19",
+      "title": "Why can't an independent set have more vectors than a spanning set, and how does the proof go",
+      "question": "Why can't an independent set have more vectors than a spanning set, and how does the proof go?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Lemma 5.2's contrapositive proof via a homogeneous system.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            11,
+            12
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T20",
+      "title": "What makes a vector space infinite-dimensional",
+      "question": "What makes a vector space infinite-dimensional?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.5"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "No finite basis.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.5",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            13
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T21",
+      "title": "In what sense is a basis like a coordinate system",
+      "question": "In what sense is a basis like a coordinate system?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.7"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Spanning reaches every vector; independence prevents redundancy.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.7",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            13
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T22",
+      "title": "Which exercise asks me to show {1, 1+x, 1+x+x^2} is a basis of P_2(F)",
+      "question": "Which exercise asks me to show {1, 1+x, 1+x+x^2} is a basis of P_2(F)?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-05-unit-5.10"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 5.10.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-05-unit-5.10",
+          "pdf": "lecture-pdfs/[Section 002] Week 2.pdf",
+          "pages": [
+            15
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T23",
+      "title": "Is a basis the smallest spanning set or the biggest independent set",
+      "question": "Is a basis the smallest spanning set or the biggest independent set?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.2"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Both: minimal spanning and maximal independent.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            1,
+            2
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T24",
+      "title": "Which exercise wants a basis of R^4 containing (1,-1,1,-1)^T and (0,2,0,-4)^T",
+      "question": "Which exercise wants a basis of R^4 containing (1,-1,1,-1)^T and (0,2,0,-4)^T?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.9"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 6.9.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.9",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T25",
+      "title": "There's an exercise about a basis of P_3(F) where every polynomial satisfies p'(1) = 3. What approach does the PDF suggest",
+      "question": "There's an exercise about a basis of P_3(F) where every polynomial satisfies p'(1) = 3. What approach does the PDF suggest?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.11"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Find four independent vectors rather than removing redundant ones.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.11",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T26",
+      "title": "Which exercise asks for a basis and the dimension of the trace-zero 3 by 3 matrices",
+      "question": "Which exercise asks for a basis and the dimension of the trace-zero 3 by 3 matrices?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.12"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 6.12.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.12",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T27",
+      "title": "Which exercise uses (1-x)^2, 2x(1-x), and x^2 as an ordered basis",
+      "question": "Which exercise uses (1-x)^2, 2x(1-x), and x^2 as an ordered basis?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.8"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 7.8.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            10
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T28",
+      "title": "Which exercise asks whether {1+4x+7x^2, 2+5x+8x^2, 3+6x+9x^2} is independent",
+      "question": "Which exercise asks whether {1+4x+7x^2, 2+5x+8x^2, 3+6x+9x^2} is independent?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.13"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Exercise 7.13.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.13",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            12
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T29",
+      "title": "If I have 3 vectors in a 4-dimensional space, can they span it",
+      "question": "If I have 3 vectors in a 4-dimensional space, can they span it?",
+      "bucket": "paraphrased_definition",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "|S|<n cannot span.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            1
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T30",
+      "title": "If five 2 by 2 matrices give a coordinate matrix of rank 3, do they span M_2(F)",
+      "question": "If five 2 by 2 matrices give a coordinate matrix of rank 3, do they span M_2(F)?",
+      "bucket": "example_lookup",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.11"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Rank 3 < 4, so they don't span.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.11",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            11
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T31",
+      "title": "What is deg(0), and does that put the zero polynomial in P_n(F)",
+      "question": "What is deg(0), and does that put the zero polynomial in P_n(F)?",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-02-unit-2.1",
+        "lecture-02-unit-2.3"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "deg(0) = -∞ ≤ n; needs the definition and the P_n description.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-02-unit-2.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            6
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        },
+        {
+          "chunk_id": "lecture-02-unit-2.3",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T32",
+      "title": "The trace-zero 2 by 2 matrices have dimension 3. Why couldn't that subspace have dimension 4",
+      "question": "The trace-zero 2 by 2 matrices have dimension 3. Why couldn't that subspace have dimension 4?",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-06-unit-6.8",
+        "lecture-06-unit-6.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "dim(U)=n only when U=V, and U is a proper subspace of M_2(F).",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-06-unit-6.8",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            4,
+            5
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        },
+        {
+          "chunk_id": "lecture-06-unit-6.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            3,
+            4
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T33",
+      "title": "Why does the order of (1, x, x^2, x^3, x^4) matter when writing coordinates in P_4(F)",
+      "question": "Why does the order of (1, x, x^2, x^3, x^4) matter when writing coordinates in P_4(F)?",
+      "bucket": "cross_lecture",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-07-unit-7.2",
+        "lecture-07-unit-7.6"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "Ordered basis definition plus the P_4 coordinate example.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-07-unit-7.2",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            7
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        },
+        {
+          "chunk_id": "lecture-07-unit-7.6",
+          "pdf": "lecture-pdfs/[Section 002] Week 3.pdf",
+          "pages": [
+            8
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T34",
+      "title": "Which axiom says α(u+v) = αu + αv",
+      "question": "Which axiom says α(u+v) = αu + αv?",
+      "bucket": "symbol_heavy",
+      "answerable": true,
+      "gold_chunk_ids": [
+        "lecture-01-unit-1.1"
+      ],
+      "supporting_chunk_ids": [],
+      "score_retrieval": true,
+      "rationale": "D1.",
+      "required_context": null,
+      "verification": [
+        {
+          "chunk_id": "lecture-01-unit-1.1",
+          "pdf": "lecture-pdfs/[Section 002] Week 1.pdf",
+          "pages": [
+            2,
+            3
+          ],
+          "method": "Checked the question against the indexed chunk text; corpus notation was checked against the PDF on 2026-10-08."
+        }
+      ]
+    },
+    {
+      "id": "T35",
+      "title": "How do I compute the determinant of a 3 by 3 matrix",
+      "question": "How do I compute the determinant of a 3 by 3 matrix?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Determinants are outside Lectures 1–7.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "T36",
+      "title": "How do I find the matrix of a linear transformation with respect to a basis",
+      "question": "How do I find the matrix of a linear transformation with respect to a basis?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Linear maps start in Lecture 8, outside the index.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "T37",
+      "title": "When are two vector spaces isomorphic",
+      "question": "When are two vector spaces isomorphic?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Isomorphisms are in Lecture 11, outside the index.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "T38",
+      "title": "What is a direct sum of two subspaces",
+      "question": "What is a direct sum of two subspaces?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Not covered in Lectures 1–7.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "T39",
+      "title": "How do I diagonalize a matrix",
+      "question": "How do I diagonalize a matrix?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Not covered in Lectures 1–7.",
+      "required_context": null,
+      "verification": []
+    },
+    {
+      "id": "T40",
+      "title": "How do I find the change-of-basis matrix between two ordered bases",
+      "question": "How do I find the change-of-basis matrix between two ordered bases?",
+      "bucket": "unanswerable",
+      "answerable": false,
+      "gold_chunk_ids": [],
+      "supporting_chunk_ids": [],
+      "score_retrieval": false,
+      "rationale": "Lecture 7 covers coordinates but not change-of-basis matrices.",
+      "required_context": null,
+      "verification": []
+    }
+  ]
+}

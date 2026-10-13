@@ -12,24 +12,24 @@ def tokenize_chunks(chunks):
     return tokenized_texts
 
 
-def retrive(question, chunks, model, k=3):
+def retrieve(question, chunks, model, k=3):
     # query and corpus need the same tokenization for word matches to work
     query_tokenized = question["question"].lower().split()
     scores = model.get_scores(query_tokenized)
     # we get 1 score per chunk in original order
 
     # argsort is lowest first, so flip it to get the highest bm25 scores
-    top_k_indicies = np.flip(np.argsort(scores))[:k]
+    top_k_indices = np.flip(np.argsort(scores))[:k]
 
-    top_k_chunk_ids = [chunks[i]["id"] for i in top_k_indicies]
+    top_k_chunk_ids = [chunks[i]["id"] for i in top_k_indices]
 
     return top_k_chunk_ids
 
 
 # fraction of gold chunks found in the first k results
 # assumes unique retrieved ids and at least one gold id
-def recall_at_k(retrived_ids, gold_ids, k=3):
-    appeared = [1 if id in gold_ids else 0 for id in retrived_ids[:k]]
+def recall_at_k(retrieved_ids, gold_ids, k=3):
+    appeared = [1 if id in gold_ids else 0 for id in retrieved_ids[:k]]
     count = sum(appeared)
     recall = count / len(gold_ids)
     return recall
@@ -49,11 +49,11 @@ def main():
     for question in eval_set["questions"]:
         if not question["score_retrieval"]:  # no gold ids means no recall score
             continue
-        retrived_ids = retrive(question, chunks, bm25, 5)
+        retrieved_ids = retrieve(question, chunks, bm25, 5)
         gold_ids = question["gold_chunk_ids"]
-        recall5 = recall_at_k(retrived_ids, gold_ids, 5)
-        recall3 = recall_at_k(retrived_ids, gold_ids, 3)
-        recall1 = recall_at_k(retrived_ids, gold_ids, 1)
+        recall5 = recall_at_k(retrieved_ids, gold_ids, 5)
+        recall3 = recall_at_k(retrieved_ids, gold_ids, 3)
+        recall1 = recall_at_k(retrieved_ids, gold_ids, 1)
         recall5_scores.append(recall5)
         recall3_scores.append(recall3)
         recall1_scores.append(recall1)

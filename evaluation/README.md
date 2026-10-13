@@ -1,6 +1,6 @@
 # Retrieval evaluation
 
-[retrieval-eval-set.json](retrieval-eval-set.json) contains 30 development questions over Lectures 1–7: 28 answerable and two unanswerable. The original nine-question seed is kept in [retrieval-check-set.json](retrieval-check-set.json). [heldout-eval-set.json](heldout-eval-set.json) has 16 questions written after the retrievers, prompts, and graph were fixed: 13 answerable and three unanswerable.
+[retrieval-eval-set.json](retrieval-eval-set.json) contains 30 development questions over Lectures 1–7: 28 answerable and two unanswerable. The original nine-question seed is kept in [retrieval-check-set.json](retrieval-check-set.json). [heldout-eval-set.json](heldout-eval-set.json) has 16 questions written after the retrievers, prompts, and graph were fixed: 13 answerable and three unanswerable. [test-eval-set.json](test-eval-set.json) is a frozen 40-question test set (34 answerable, six unanswerable), meant to be run once per finished change.
 
 The questions ask for definitions in different wording, specific examples, math notation, and evidence from more than one lecture. Two ask about topics outside the corpus. Each record includes gold chunk IDs, optional supporting IDs, and the source pages used to check them.
 

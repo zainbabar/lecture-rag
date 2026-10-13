@@ -39,26 +39,26 @@ def rank_embeddings(query_embedding, embeddings, k):
 
     # argsort gives lowest first, flip it so the best matches come first
     # return indices so we can look up the chunks in the same order
-    sorted_indicies = np.flip(np.argsort(similarity_scores))
+    sorted_indices = np.flip(np.argsort(similarity_scores))
 
-    top_k = sorted_indicies[:k]
+    top_k = sorted_indices[:k]
 
     return top_k
 
 
-def retrive(question, chunks, embeddings, model, k=3):
+def retrieve(question, chunks, embeddings, model, k=3):
     query = question["question"]
     # bge's search instruction goes on the query, not the chunk texts
     bge_instruction = "Represent this sentence for searching relevant passages: "
     query_embedding = model.encode(bge_instruction + query)
 
     # get indices of the top k chunks for this query
-    top_k_indicies = rank_embeddings(query_embedding, embeddings, k)
+    top_k_indices = rank_embeddings(query_embedding, embeddings, k)
 
     # turn row indices back into stable chunk ids, keeping the ranked order
     top_k_chunks = []
 
-    for i in top_k_indicies:
+    for i in top_k_indices:
         top_k_chunks.append(chunks[i]["id"])
 
     return top_k_chunks
@@ -66,8 +66,8 @@ def retrive(question, chunks, embeddings, model, k=3):
 
 # what fraction of the gold chunks showed up in the first k results
 # assumes unique retrieved ids and at least one gold id
-def recall_at_k(retrived_ids, gold_ids, k=3):
-    appeared = [1 if id in gold_ids else 0 for id in retrived_ids[:k]]
+def recall_at_k(retrieved_ids, gold_ids, k=3):
+    appeared = [1 if id in gold_ids else 0 for id in retrieved_ids[:k]]
     count = sum(appeared)
     recall = count / len(gold_ids)
     return recall
@@ -91,15 +91,15 @@ def main():
         # recall needs gold ids, so leave unanswerable questions out
         if not question["score_retrieval"]:
             continue
-        retrived_ids = retrive(question, chunks, embeddings, model, k)
+        retrieved_ids = retrieve(question, chunks, embeddings, model, k)
         gold_ids = question["gold_chunk_ids"]
-        recall5 = recall_at_k(retrived_ids, gold_ids, 5)
-        recall3 = recall_at_k(retrived_ids, gold_ids, 3)
-        recall1 = recall_at_k(retrived_ids, gold_ids, 1)
+        recall5 = recall_at_k(retrieved_ids, gold_ids, 5)
+        recall3 = recall_at_k(retrieved_ids, gold_ids, 3)
+        recall1 = recall_at_k(retrieved_ids, gold_ids, 1)
         recall5_scores.append(recall5)
         recall3_scores.append(recall3)
         recall1_scores.append(recall1)
-        # to inspect misses, compare retrived_ids with gold_ids here
+        # to inspect misses, compare retrieved_ids with gold_ids here
 
     # average per-question recall, so each scored question has equal weight
     avg_recall_at_5 = sum(recall5_scores) / len(recall5_scores)

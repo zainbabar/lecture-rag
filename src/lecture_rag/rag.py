@@ -11,7 +11,7 @@ from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 
 from .dense import embed_chunks, load_embedding_model
-from .hybrid import hybrid_retrive
+from .hybrid import hybrid_retrieve
 from .prepare import DEFAULT_DATASET, fingerprint, prepare_experiment
 from .sparse import tokenize_chunks
 
@@ -27,7 +27,7 @@ def get_passages(
     k: int = 5,
 ) -> list[dict]:
     # same hybrid search as the retrieval experiment, default is top 5
-    top_k_chunk_ids = hybrid_retrive(
+    top_k_chunk_ids = hybrid_retrieve(
         question, chunks, embeddings, dense_model, sparse_model, dense_weight, k
     )
 
