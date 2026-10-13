@@ -1,10 +1,13 @@
 import argparse
 from pathlib import Path
+import os
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from sentence_transformers import SentenceTransformer
+
+from .rag import generate_answer
 
 from .dense import load_embedding_model
 from .metrics import recall_at_k
@@ -14,6 +17,7 @@ from .prepare import DEFAULT_DATASET, ROOT, prepare_experiment
 STORE_PATH = ROOT / ".cache" / "chroma"
 COLLECTION_NAME = "math235"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
+URL = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
 
 # langchain expects these two methods, so wrap the bge model we already use
 class BGEEmbeddings(Embeddings):
@@ -96,6 +100,7 @@ def main() -> None:
     modes = parser.add_mutually_exclusive_group(required=True)
     modes.add_argument("--index", action="store_true", help="embed and save the chunks")
     modes.add_argument("--evaluate", action="store_true", help="score retrieval from the saved index")
+    modes.add_argument("--ask", type=str, help="ask a question based on embedded chunks")
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     args = parser.parse_args()
 
@@ -115,6 +120,16 @@ def main() -> None:
     # don't report zero recall just because we forgot to index
     if not store.get()["ids"]:
         parser.error("the store is empty; run --index first")
+    
+    if args.ask is not None:
+        question = {"question": args.ask}
+        ids = retrieve(question=question, store=store)
+        passages = get_passages(ids, store)
+        answer = generate_answer(question, passages, URL)
+        print(answer)
+        return
+
+  
 
     # same recall calculation as dense.py; only the retrieval call changes
     recall1_scores = []
