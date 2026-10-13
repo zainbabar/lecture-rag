@@ -75,6 +75,21 @@ def retrieve(question: dict, store: Chroma, k: int = 5) -> list[str]:
     # want to get just the ids not the whole document IN ORDER
     ids = [doc.id for doc in retrived_documents]
     return ids
+
+# take the retrieved ids and return formatted passages for generate_answer()
+def get_passages(retrieved_ids: list[str], documents: list[Document]):
+    passages = []
+    # for each rank id pair in retrived ids, get matching document 
+    for rank, id in enumerate(retrieved_ids, start=1):
+        for doc in documents:
+            if doc.id == id:
+                passages.append({"id": id, "passage": doc.page_content, "rank": rank})
+                break # break out no reason to keep searching after
+    
+    return passages
+        
+    
+
    
 
 
