@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from langchain_chroma import Chroma
@@ -6,7 +7,8 @@ from langchain_core.embeddings import Embeddings
 from sentence_transformers import SentenceTransformer
 
 from .dense import load_embedding_model
-from .prepare import ROOT, prepare_experiment
+from .metrics import recall_at_k
+from .prepare import DEFAULT_DATASET, ROOT, prepare_experiment
 
 # save the index locally; .cache is already gitignored
 STORE_PATH = ROOT / ".cache" / "chroma"
@@ -77,24 +79,50 @@ def retrieve(question: dict, store: Chroma, k: int = 5) -> list[str]:
 
 
 def main() -> None:
-    eval_set, chunks = prepare_experiment()  # only need the chunks for setup
-    documents = chunks_to_documents(chunks=chunks)
+    parser = argparse.ArgumentParser(description="Index the notes or evaluate Chroma retrieval.")
+    # pick one mode; don't re-embed the chunks when we just want to evaluate
+    modes = parser.add_mutually_exclusive_group(required=True)
+    modes.add_argument("--index", action="store_true", help="embed and save the chunks")
+    modes.add_argument("--evaluate", action="store_true", help="score retrieval from the saved index")
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    args = parser.parse_args()
+
+    eval_set, chunks = prepare_experiment(args.dataset)
     model = load_embedding_model()
     store = load_store(BGEEmbeddings(model=model))
 
-    # now indexing aka adding documents to the chroma store
-    # specificy the ids that we want documents to be stored with
-    # databse id should be the same as the document/chunk id 
-    ids = [doc.id for doc in documents]
-    # langchain calls the embed_documents itself
-    stored_ids = store.add_documents(documents=documents, ids=ids) # id goes thru **kwargs since not named param in add_documents
-    # assert(ids == stored_ids) # make sure the stored ids are the same as the actual chunk ids 
+    if args.index:
+        documents = chunks_to_documents(chunks=chunks)
+        ids = [doc.id for doc in documents]
+        # langchain embeds the text, then chroma saves it under our chunk ids
+        # ids goes through **kwargs since it isn't a named parameter in add_documents
+        stored_ids = store.add_documents(documents=documents, ids=ids)
+        print(f"Saved {len(stored_ids)} chunks to {STORE_PATH}")
+        return
 
-    # question dict, test q 
-    question = eval_set["questions"][0]
-    ids = retrieve(question, store)
-    print(ids)
-    
+    # don't report zero recall just because we forgot to index
+    if not store.get()["ids"]:
+        parser.error("the store is empty; run --index first")
+
+    # same recall calculation as dense.py; only the retrieval call changes
+    recall1_scores = []
+    recall3_scores = []
+    recall5_scores = []
+    for question in eval_set["questions"]:
+        if not question["score_retrieval"]:
+            continue  # no gold ids means no recall score
+        retrieved_ids = retrieve(question, store, k=5)
+        gold_ids = question["gold_chunk_ids"]
+        recall1_scores.append(recall_at_k(retrieved_ids, gold_ids, 1))
+        recall3_scores.append(recall_at_k(retrieved_ids, gold_ids, 3))
+        recall5_scores.append(recall_at_k(retrieved_ids, gold_ids, 5))
+
+    if not recall1_scores:
+        parser.error("this dataset has no questions scored for retrieval")
+    print(f"Dataset: {args.dataset}; scored {len(recall1_scores)} questions")
+    print(f"average recall@1: {sum(recall1_scores) / len(recall1_scores)}")
+    print(f"average recall@3: {sum(recall3_scores) / len(recall3_scores)}")
+    print(f"average recall@5: {sum(recall5_scores) / len(recall5_scores)}")
 
 
 if __name__ == "__main__":
