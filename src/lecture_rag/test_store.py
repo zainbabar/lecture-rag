@@ -5,6 +5,7 @@ from .vector_store import get_passages
 from .rag import generate_answer
 import os
 
+
 # try retrieval from the saved index, then generate an answer from the saved passages
 def main():
     url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
@@ -16,7 +17,6 @@ def main():
     answer = generate_answer(question, passages, url)
     print(answer)
 
-    
-    
+
 if __name__ == "__main__":
     main()

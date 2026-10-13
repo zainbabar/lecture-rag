@@ -15,21 +15,36 @@ from .sparse import retrieve as sparse_retrieve
 from .sparse import tokenize_chunks
 
 
-RERANK_MODEL = "BAAI/bge-reranker-base"
+RERANK_MODEL = "Qwen/Qwen3-Reranker-8B"
+
+# qwen's reranker reads this as part of its prompt, so it should describe our task
+# the default one says "web search query", which isn't what we have
+RERANK_INSTRUCTION = (
+    "Given a question from a student studying linear algebra, find the passage from the "
+    "lecture notes that answers it. Passages are definitions, theorems, examples, or "
+    "exercises. Prefer the passage that actually states the answer over one that only "
+    "mentions the same terms."
+)
 
 
 def load_rerank_model(device: str | None = None) -> CrossEncoder:
     # same device override as the embedding model
     # no local_files_only here so the first run can download the weights
+    # prompts maps a name to an instruction, default_prompt_name picks which one predict() uses
     return CrossEncoder(
         RERANK_MODEL,
         device=device or os.environ.get("LECTURE_RAG_DEVICE"),
         cache_folder=str(MODEL_CACHE),
+        prompts={"notes": RERANK_INSTRUCTION},
+        default_prompt_name="notes",
     )
-    
+
+
 # take top candidates ids and chunks, rerank the chunksbased on relevance score with the question
 # return the top k ids ordered by relevance
-def rerank(question: dict, candidate_ids: list, chunks: list[dict], rerank_model: CrossEncoder, k=5) -> list:
+def rerank(
+    question: dict, candidate_ids: list, chunks: list[dict], rerank_model: CrossEncoder, k=5
+) -> list:
     # need the actual passage text of the candidate chunks to get a relevance score
     # but keep it in order so we can match up candidate id with its text
     candidate_texts = []
@@ -37,21 +52,20 @@ def rerank(question: dict, candidate_ids: list, chunks: list[dict], rerank_model
         for chunk in chunks:
             if chunk["id"] == id:
                 candidate_texts.append(chunk["search_text"])
-                break # break out if found no point continuing
+                break  # break out if found no point continuing
     # now indexes match, id at candidate_ids[0]'s search text is candidate_texts[0]
 
-    pairs = [[question["question"], passage] for passage in candidate_texts] # input pairs
+    pairs = [[question["question"], passage] for passage in candidate_texts]  # input pairs
     scores = rerank_model.predict(pairs)
-    
+
     # need to sort the indicies by the value they point to
     # instead of value themselves
-    # so we dont lose the index correspondance 
-    sorted_indicies = np.argsort(scores, descending=True) # best first
+    # so we dont lose the index correspondance
+    sorted_indicies = np.argsort(scores, descending=True)  # best first
     top_k_indicies = sorted_indicies[:k]
 
     top_k_ids = [candidate_ids[i] for i in top_k_indicies]
     return top_k_ids
-         
 
 
 def main():
@@ -82,7 +96,9 @@ def main():
         # candidates are the top 10 from each retriever, merged with no duplicates
         dense_ids = dense_retrieve(question, chunks, embeddings, dense_model, 10)
         sparse_ids = sparse_retrieve(question, chunks, sparse_model, 10)
-        candidate_ids = list(dict.fromkeys(dense_ids + sparse_ids)) # remove duplicates and keep the order
+        candidate_ids = list(
+            dict.fromkeys(dense_ids + sparse_ids)
+        )  # remove duplicates and keep the order
 
         # time only the reranking step, that's the latency it adds
         start = time.perf_counter()

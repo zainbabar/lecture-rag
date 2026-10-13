@@ -1,10 +1,12 @@
+import argparse
 import os
+from pathlib import Path
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from .metrics import mrr, recall_at_k
-from .prepare import ROOT, prepare_experiment
+from .prepare import DEFAULT_DATASET, ROOT, prepare_experiment
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 MODEL_CACHE = ROOT / ".cache" / "huggingface"
@@ -66,9 +68,13 @@ def retrieve(question, chunks, embeddings, model, k=3):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    args = parser.parse_args()
+
     model = load_embedding_model()
 
-    eval_set, chunks = prepare_experiment()
+    eval_set, chunks = prepare_experiment(args.dataset)
 
     # embed the corpus once, then only embed each query during search
     embeddings = embed_chunks(chunks, model)

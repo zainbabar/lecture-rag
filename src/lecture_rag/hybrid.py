@@ -1,9 +1,12 @@
+import argparse
+from pathlib import Path
+
 from rank_bm25 import BM25Okapi
 
 from .dense import embed_chunks, load_embedding_model
 from .dense import retrieve as dense_retrieve
 from .metrics import mrr, recall_at_k
-from .prepare import prepare_experiment
+from .prepare import DEFAULT_DATASET, prepare_experiment
 from .sparse import retrieve as sparse_retrieve
 from .sparse import tokenize_chunks
 
@@ -37,6 +40,10 @@ def hybrid_retrieve(question, chunks, embeddings, dense_model, sparse_model, den
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    args = parser.parse_args()
+
     # reuse the model + indexes across questions, not rebuild them per query
     dense_model = load_embedding_model()
     recall5_scores = []
@@ -44,7 +51,7 @@ def main():
     recall1_scores = []
     all_retrieved_ids = []
     all_gold_ids = []
-    eval_set, chunks = prepare_experiment()
+    eval_set, chunks = prepare_experiment(args.dataset)
     # bm25 needs tokens; dense needs an embedding for each chunk
     tokenized_texts = tokenize_chunks(chunks)
     embeddings = embed_chunks(chunks, dense_model)

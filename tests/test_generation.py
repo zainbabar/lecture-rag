@@ -18,7 +18,9 @@ def test_batch_export_preserves_evidence(monkeypatch, tmp_path):
     output = tmp_path / "results" / "answers.json"
     monkeypatch.setattr("sys.argv", ["rag.py", "--output", str(output)])
     monkeypatch.setattr(rag, "load_embedding_model", lambda: object())
-    monkeypatch.setattr(rag, "prepare_experiment", lambda *args: ({"questions": [question]}, chunks))
+    monkeypatch.setattr(
+        rag, "prepare_experiment", lambda *args: ({"questions": [question]}, chunks)
+    )
     monkeypatch.setattr(rag, "embed_chunks", lambda chunks, model: [])
     monkeypatch.setattr(rag, "BM25Okapi", lambda tokens: object())
     monkeypatch.setattr(rag, "answer_question", lambda *args: ("An answer.", passages))

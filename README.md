@@ -4,11 +4,12 @@ A study assistant over my MATH 235 lecture notes. It finds relevant passages and
 
 I'm building this to learn how to measure and debug RAG. Dense search, BM25, weighted hybrid search, a baseline answer flow, and a LangGraph version with an evidence check and one query rewrite all work.
 
-I also added persistent Chroma storage with LangChain retrieval, so I can save the chunk embeddings once and ask questions from the saved index.
+I also added persistent Chroma storage with LangChain retrieval, so I can save the chunk embeddings once and ask questions from the saved index, and a cross-encoder reranker that reorders the retrieved chunks. The reranker is a retrieval experiment so far. `rag.py` and `graph.py` don't use it yet.
 
 What I found so far:
 
 - Dense search beats BM25 on these notes. Weighted hybrid looked best on my 30 dev questions (91.7% Recall@5), but on 16 held-out questions it tied dense at 76.9%. Part of that dev gain came from tuning on the same questions.
+- A big LLM reranker fixed most of the ordering problems. Qwen3-Reranker-8B over the merged dense and BM25 top 10s got 0.971 MRR@5 on the 40-question test set, against 0.902 for dense and 0.764 for hybrid. It costs about 1.8 s per question. A smaller reranker (`bge-reranker-base`) was worse than dense on my dev set.
 - Math notation causes most retrieval misses. Questions like "what does `[v]_B` mean" never say "coordinate vector", which is how the notes phrase it.
 - The LangGraph evidence check plus one query rewrite fixed Q13 on the dev set. On the held-out set it fixed one question and broke two, because the checker rejected passages the model could have answered from.
 - Both versions abstained on all five unanswerable questions.
@@ -116,11 +117,53 @@ The graph helped once and hurt twice:
 
 On new questions, the strict checker throws away answers the model could have built from related passages. On the dev set that never came up. Retrieval misses (H08, H10, H12) are the bigger problem, and the rewrite only fixes some of them.
 
+## Reranker
+
+Dense search finds the right chunk but doesn't always put it first. A cross-encoder reads the question and one chunk together and scores the pair. Dense search can't do that, because it embeds the question and each chunk separately and compares the vectors.
+
+`rerank.py` takes the top 10 chunks from dense and the top 10 from BM25, merges them without duplicates (up to 20 chunks), scores each one against the question, and keeps the top 5. The reranker reads the same `search_text` as the other retrievers.
+
+I tried four setups on the dev set and checked the two best on the held-out set:
+
+| Dev set | MRR@5 | Recall@1 | Recall@3 | Recall@5 |
+| --- | ---: | ---: | ---: | ---: |
+| Dense | 0.760 | 60.7% | 76.2% | 84.5% |
+| `bge-reranker-base` | 0.671 | 49.4% | 70.2% | 82.7% |
+| `bge-reranker-base`, body only (no header) | 0.515 | 35.7% | 55.9% | 59.5% |
+| `bge-reranker-v2-m3` | 0.738 | 56.5% | 84.5% | 85.7% |
+| `Qwen3-Reranker-8B` + instruction | 0.982 | 88.7% | 98.8% | 100% |
+
+- `bge-reranker-base` was worse than dense. When it pushed a gold chunk down, it usually picked a short chunk that reused the question's words over the one that answered it. For "what degree is the zero polynomial", it ranked Exercise 3.10, which only mentions "zero polynomial" and "degree", above Definition 2.1, which says `deg(0) = -∞`.
+- Scoring only the chunk body, without the lecture prefix and assumptions, dropped MRR from 0.671 to 0.515. The header carries a lot of the signal.
+- Qwen3-Reranker-8B is an LLM that reads a task instruction along with the pair. I wrote one instruction before running it and didn't change it: "Given a question from a student studying linear algebra, find the passage from the lecture notes that answers it. Passages are definitions, theorems, examples, or exercises. Prefer the passage that actually states the answer over one that only mentions the same terms." I didn't run the 8B model without the instruction, so I can't say how much of the gain comes from the instruction and how much from the model size.
+
+I picked the model after seeing dev and held-out results, so those numbers are optimistic. On held-out, `bge-reranker-v2-m3` got 0.788 MRR@5 and Qwen3-Reranker-8B got 1.000.
+
 ## Test set
 
 The held-out set is used up now that I've looked at its per-question results, so I froze a third set in [evaluation/test-eval-set.json](evaluation/test-eval-set.json): 40 questions, 34 answerable and six unanswerable. The gold chunks cover most units that neither earlier set uses. Three unanswerable questions (linear transformation matrices, isomorphisms, change-of-basis matrices) are close to topics the notes do cover, which makes abstaining harder.
 
-I only run it once per finished change, like the reranker, and report totals without digging into single questions. No results yet.
+I ran dense, hybrid, and the Qwen3-Reranker-8B setup on it once each, with nothing changed after the dev and held-out runs:
+
+| Test set, 34 answerable | MRR@5 | Recall@1 | Recall@3 | Recall@5 |
+| --- | ---: | ---: | ---: | ---: |
+| Dense | 0.902 | 80.9% | 94.1% | 95.6% |
+| Hybrid, 75% dense weight | 0.764 | 67.6% | 73.5% | 89.7% |
+| Dense + BM25 candidates, `Qwen3-Reranker-8B` | 0.971 | 92.6% | 97.1% | 97.1% |
+
+MRR@5 across all three sets:
+
+| | Dev | Held-out | Test |
+| --- | ---: | ---: | ---: |
+| Dense | 0.760 | 0.746 | 0.902 |
+| Hybrid, 75% dense weight | 0.656 | 0.708 | 0.764 |
+| Reranked | 0.982 | 1.000 | 0.971 |
+
+- The reranker is best on every metric, but the margin depends on how hard the set is. Dense is much stronger on the test set than on dev, so the MRR gain shrinks from +0.22 to +0.07. Most of it is at rank 1 (Recall@1 up about 12 points). Recall@5 is up by one gold chunk.
+- Hybrid has lower MRR than dense on all three sets. Fusing in BM25 helps recall but puts related chunks above the answer.
+- The reranked Recall@3 and Recall@5 are both 97.1%, so a gold chunk is missing from the 20 candidates. I haven't checked which one.
+- Reranking takes about 1.8 s per question with the 8B model. `bge-reranker-v2-m3` takes about 0.3 s and `bge-reranker-base` about 0.1 s.
+- Ranking is only half of it. I haven't measured whether better retrieval gives better answers.
 
 ## Run it
 
@@ -147,7 +190,7 @@ uv run python -m lecture_rag.sparse
 uv run python -m lecture_rag.hybrid
 ```
 
-These print Recall@1, @3, and @5. Hybrid fuses ten candidates from each retriever with a dense weight of 0.75 and RRF constant of 60. These scripts rebuild embeddings and BM25 once per run. The Chroma path below saves embeddings between runs.
+These print Recall@1, @3, and @5, plus MRR@5. Dense, hybrid, and the reranker take `--dataset`, so `--dataset evaluation/test-eval-set.json` runs the test set. Hybrid fuses ten candidates from each retriever with a dense weight of 0.75 and RRF constant of 60. These scripts rebuild embeddings and BM25 once per run. The Chroma path below saves embeddings between runs.
 
 For generation, start Ollama and download the model:
 
@@ -159,6 +202,14 @@ uv run python -m lecture_rag.rag --output artifacts/baseline-answers.json
 ```
 
 `rag.py` answers all 30 questions and saves JSON with the answers, full retrieved passages, settings, and hashes of the corpus and dataset. The prompt asks for evidence-only answers and citations. Set `OLLAMA_URL` to override the default `http://127.0.0.1:11434/api/chat` endpoint.
+
+To run the reranker:
+
+```sh
+uv run python -m lecture_rag.rerank
+```
+
+The first run downloads Qwen3-Reranker-8B, about 16 GB, into the project cache. It prints the same metrics as the retrievers plus the average rerank time per question. Change `RERANK_MODEL` in `rerank.py` to try a different model.
 
 To use the persistent Chroma index:
 
@@ -198,7 +249,8 @@ lecture-pdfs/     Original PDFs
 
 - `src/lecture_rag/chunk.py` / `prepare.py`: split numbered lecture units, attach source metadata and checked assumptions, validate the corpus and labels.
 - `dense.py` / `sparse.py` / `hybrid.py`: NumPy cosine ranking, BM25, and weighted reciprocal rank fusion.
-- `metrics.py`: shared Recall@k calculation used by the retrievers.
+- `metrics.py`: Recall@k and MRR, shared by the retrievers.
+- `rerank.py`: merge dense and BM25 candidates, score them with a cross-encoder, and evaluate the reranked top 5.
 - `vector_store.py`: persistent Chroma indexing, LangChain dense retrieval, retrieval evaluation, and single-question answers from saved passages.
 - `rag.py`: collect evidence, build the prompt, call Ollama, and export answers.
 - `graph.py`: LangGraph state, nodes, and routing for retrieve, check evidence, rewrite once, answer, or abstain.
@@ -209,4 +261,4 @@ Each chunk keeps its original body and a `search_text` containing the lecture pr
 
 ## Next
 
-Add a reranker over the top hybrid candidates and score it once on the test set, since early ranking and notation-heavy misses (H10) are the weakest part. Loosen the checker so it accepts answers that follow directly from the passages, and recheck H06. MRR and an answer-quality score are still pending.
+Use the reranker in the answer flow and the graph, and measure whether the better ranking gives better answers. Loosen the checker so it accepts answers that follow directly from the passages, and recheck H06. An answer-quality score is still pending.
