@@ -4,6 +4,8 @@ A study assistant over my MATH 235 lecture notes. It finds relevant passages and
 
 I'm building this to learn how to measure and debug RAG. Dense search, BM25, weighted hybrid search, a baseline answer flow, and a LangGraph version with an evidence check and one query rewrite all work.
 
+I also added persistent Chroma storage with LangChain retrieval, so I can save the chunk embeddings once and ask questions from the saved index.
+
 What I found so far:
 
 - Dense search beats BM25 on these notes. Weighted hybrid looked best on my 30 dev questions (91.7% Recall@5), but on 16 held-out questions it tied dense at 76.9%. Part of that dev gain came from tuning on the same questions.
@@ -20,11 +22,14 @@ The experiment searches 75 numbered chunks from Lectures 1–7. There are 30 dev
 | Retriever | Recall@1 | Recall@3 | Recall@5 |
 | --- | ---: | ---: | ---: |
 | Dense | 60.7% | 76.2% | 84.5% |
+| Dense, Chroma + LangChain | 60.7% | 76.2% | 84.5% |
 | BM25 | 26.8% | 46.4% | 55.4% |
 | Hybrid, equal weights | 41.1% | 70.8% | 90.5% |
 | Hybrid, 75% dense weight | 44.6% | 70.8% | 91.7% |
 
-I first ran these on my Mac, then reran the 75% dense-weight hybrid on the GX10 and got the same numbers. Recall is computed per question, then averaged over the 28 answerable questions.
+I first ran the NumPy dense, BM25, and hybrid comparisons on my Mac, then reran the 75% dense-weight hybrid on the GX10 and got the same numbers. Recall is computed per question, then averaged over the 28 answerable questions.
+
+The Chroma run uses the same BGE model, query instruction, and 75 chunks as NumPy dense search. I reopened the saved index and got the same dev recall at all three cutoffs. Chroma uses a cosine HNSW index for search; LangChain wraps embedding and retrieval. This path uses dense search only. BM25 and weighted fusion are still in the original hybrid path. I haven't measured a speed difference or run Chroma on the held-out or test sets yet.
 
 Dense ranks the direct answer better near the top. Hybrid finds more labelled evidence within five results, but sometimes pushes related passages above the answer. BM25 lowercases the text and splits on whitespace, so punctuation and math notation can get in the way of matching.
 
@@ -142,7 +147,7 @@ uv run python -m lecture_rag.sparse
 uv run python -m lecture_rag.hybrid
 ```
 
-These print Recall@1, @3, and @5. Hybrid fuses ten candidates from each retriever with a dense weight of 0.75 and RRF constant of 60. Embeddings and BM25 are built once per run; embeddings aren't persisted yet.
+These print Recall@1, @3, and @5. Hybrid fuses ten candidates from each retriever with a dense weight of 0.75 and RRF constant of 60. These scripts rebuild embeddings and BM25 once per run. The Chroma path below saves embeddings between runs.
 
 For generation, start Ollama and download the model:
 
@@ -154,6 +159,20 @@ uv run python -m lecture_rag.rag --output artifacts/baseline-answers.json
 ```
 
 `rag.py` answers all 30 questions and saves JSON with the answers, full retrieved passages, settings, and hashes of the corpus and dataset. The prompt asks for evidence-only answers and citations. Set `OLLAMA_URL` to override the default `http://127.0.0.1:11434/api/chat` endpoint.
+
+To use the persistent Chroma index:
+
+```sh
+uv run python -m lecture_rag.vector_store --index
+uv run python -m lecture_rag.vector_store --evaluate
+uv run python -m lecture_rag.vector_store --ask "What is a basis?"
+```
+
+`--index` embeds the chunks and saves their vectors, search text, stable IDs, and source metadata in `.cache/chroma`. Running it again re-embeds and updates records with the same IDs. `--evaluate` reopens the index and prints Recall@1/3/5 on the dev questions; it also accepts `--dataset`.
+
+`--ask` embeds the question, retrieves five chunk IDs through LangChain, and fetches their saved text from Chroma. It passes those passages to the same Qwen answer function as `rag.py` and prints the answer with chunk-ID citations. Ollama needs to be running for this mode. Evaluation and asking embed questions only. I checked the saved-index answer flow on a linear-independence question; a full answer-quality review is still pending.
+
+Re-index if the chunk text changes. If chunks are removed or the embedding model changes, rebuild the local store; this script doesn't clean up old records automatically.
 
 To run the graph version on the same questions:
 
@@ -180,6 +199,7 @@ lecture-pdfs/     Original PDFs
 - `src/lecture_rag/chunk.py` / `prepare.py`: split numbered lecture units, attach source metadata and checked assumptions, validate the corpus and labels.
 - `dense.py` / `sparse.py` / `hybrid.py`: NumPy cosine ranking, BM25, and weighted reciprocal rank fusion.
 - `metrics.py`: shared Recall@k calculation used by the retrievers.
+- `vector_store.py`: persistent Chroma indexing, LangChain dense retrieval, retrieval evaluation, and single-question answers from saved passages.
 - `rag.py`: collect evidence, build the prompt, call Ollama, and export answers.
 - `graph.py`: LangGraph state, nodes, and routing for retrieve, check evidence, rewrite once, answer, or abstain.
 
