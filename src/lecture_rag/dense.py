@@ -3,7 +3,7 @@ import os
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from .metrics import recall_at_k
+from .metrics import mrr, recall_at_k
 from .prepare import ROOT, prepare_experiment
 
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
@@ -78,6 +78,8 @@ def main():
     recall5_scores = []
     recall3_scores = []
     recall1_scores = []
+    all_retrieved_ids = []
+    all_gold_ids = []
 
     for question in eval_set["questions"]:
         # recall needs gold ids, so leave unanswerable questions out
@@ -85,6 +87,8 @@ def main():
             continue
         retrieved_ids = retrieve(question, chunks, embeddings, model, k)
         gold_ids = question["gold_chunk_ids"]
+        all_retrieved_ids.append(retrieved_ids)
+        all_gold_ids.append(gold_ids)
         recall5 = recall_at_k(retrieved_ids, gold_ids, 5)
         recall3 = recall_at_k(retrieved_ids, gold_ids, 3)
         recall1 = recall_at_k(retrieved_ids, gold_ids, 1)
@@ -101,6 +105,7 @@ def main():
     print(f"average recall@5: {avg_recall_at_5}")
     print(f"average recall@3: {avg_recall_at_3}")
     print(f"average recall@1: {avg_recall_at_1}")
+    print(f"MRR@5: {mrr(all_retrieved_ids, all_gold_ids, k=5)}")
 
 
 if __name__ == "__main__":

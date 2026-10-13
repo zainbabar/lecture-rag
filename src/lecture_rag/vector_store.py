@@ -8,7 +8,7 @@ from langchain_core.embeddings import Embeddings
 from sentence_transformers import SentenceTransformer
 
 from .dense import load_embedding_model
-from .metrics import recall_at_k
+from .metrics import mrr, recall_at_k
 from .prepare import DEFAULT_DATASET, ROOT, prepare_experiment
 from .rag import generate_answer
 
@@ -143,11 +143,15 @@ def main() -> None:
     recall1_scores = []
     recall3_scores = []
     recall5_scores = []
+    all_retrieved_ids = []
+    all_gold_ids = []
     for question in eval_set["questions"]:
         if not question["score_retrieval"]:
             continue  # no gold ids means no recall score
         retrieved_ids = retrieve(question, store, k=5)
         gold_ids = question["gold_chunk_ids"]
+        all_retrieved_ids.append(retrieved_ids)
+        all_gold_ids.append(gold_ids)
         recall1_scores.append(recall_at_k(retrieved_ids, gold_ids, 1))
         recall3_scores.append(recall_at_k(retrieved_ids, gold_ids, 3))
         recall5_scores.append(recall_at_k(retrieved_ids, gold_ids, 5))
@@ -158,6 +162,7 @@ def main() -> None:
     print(f"average recall@1: {sum(recall1_scores) / len(recall1_scores)}")
     print(f"average recall@3: {sum(recall3_scores) / len(recall3_scores)}")
     print(f"average recall@5: {sum(recall5_scores) / len(recall5_scores)}")
+    print(f"MRR@5: {mrr(all_retrieved_ids, all_gold_ids, k=5)}")
 
 
 if __name__ == "__main__":
