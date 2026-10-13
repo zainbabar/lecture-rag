@@ -111,6 +111,12 @@ The graph helped once and hurt twice:
 
 On new questions, the strict checker throws away answers the model could have built from related passages. On the dev set that never came up. Retrieval misses (H08, H10, H12) are the bigger problem, and the rewrite only fixes some of them.
 
+## Test set
+
+The held-out set is used up now that I've looked at its per-question results, so I froze a third set in [evaluation/test-eval-set.json](evaluation/test-eval-set.json): 40 questions, 34 answerable and six unanswerable. The gold chunks cover most units that neither earlier set uses. Three unanswerable questions (linear transformation matrices, isomorphisms, change-of-basis matrices) are close to topics the notes do cover, which makes abstaining harder.
+
+I only run it once per finished change, like the reranker, and report totals without digging into single questions. No results yet.
+
 ## Run it
 
 Python 3.12, [uv](https://docs.astral.sh/uv/), and Ollama. The current machine is a GX10 with an NVIDIA GB10 GPU; embedding setup also supports CPU and Apple Silicon.
@@ -155,7 +161,7 @@ To run the graph version on the same questions:
 uv run python -m lecture_rag.graph
 ```
 
-Both scripts take `--dataset evaluation/heldout-eval-set.json` and `--output` to run the held-out questions.
+Both scripts take `--dataset` and `--output`, so `--dataset evaluation/heldout-eval-set.json` runs the held-out questions and `evaluation/test-eval-set.json` runs the test set.
 
 It saves answers, the checker's decision and reason, and the final passages to `artifacts/graph-answers.json`. The checker and rewriter call Ollama through `langchain-ollama`'s `ChatOllama`; the answer step reuses `generate_answer()` from `rag.py`. The answer step reads `OLLAMA_URL`; the checker and rewriter still use `ChatOllama`'s default local host.
 
@@ -182,4 +188,4 @@ Each chunk keeps its original body and a `search_text` containing the lecture pr
 
 ## Next
 
-Add a reranker over the top hybrid candidates, since early ranking and notation-heavy misses (H10) are the weakest part. Loosen the checker so it accepts answers that follow directly from the passages, and recheck H06. MRR and an answer-quality score are still pending.
+Add a reranker over the top hybrid candidates and score it once on the test set, since early ranking and notation-heavy misses (H10) are the weakest part. Loosen the checker so it accepts answers that follow directly from the passages, and recheck H06. MRR and an answer-quality score are still pending.
