@@ -1,4 +1,4 @@
-"""Check the Ollama boundary without loading models or calling the server."""
+# check the Ollama boundary without loading models or calling the server
 
 import io
 import json

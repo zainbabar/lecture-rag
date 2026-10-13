@@ -179,6 +179,7 @@ lecture-pdfs/     Original PDFs
 
 - `src/lecture_rag/chunk.py` / `prepare.py`: split numbered lecture units, attach source metadata and checked assumptions, validate the corpus and labels.
 - `dense.py` / `sparse.py` / `hybrid.py`: NumPy cosine ranking, BM25, and weighted reciprocal rank fusion.
+- `metrics.py`: shared Recall@k calculation used by the retrievers.
 - `rag.py`: collect evidence, build the prompt, call Ollama, and export answers.
 - `graph.py`: LangGraph state, nodes, and routing for retrieve, check evidence, rewrite once, answer, or abstain.
 

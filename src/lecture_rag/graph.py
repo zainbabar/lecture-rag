@@ -1,42 +1,39 @@
-from typing import TypedDict
+import argparse
+import json
+import operator
+import os
+import time
 from pathlib import Path
+from typing import Annotated, TypedDict
 
+from langchain_ollama import ChatOllama
 from langgraph.graph import END, START, StateGraph
 from rank_bm25 import BM25Okapi
 
 from .dense import embed_chunks, load_embedding_model
+from .prepare import DEFAULT_DATASET, fingerprint, prepare_experiment
 from .rag import generate_answer, get_passages
 from .sparse import tokenize_chunks
 
-from .prepare import DEFAULT_DATASET, fingerprint, prepare_experiment
-
-from langchain_ollama import ChatOllama
-import argparse
-import json
-import time
-
-from typing import Annotated
-import operator
-
-import os
 
 # state is the data one question carries through the graph
 # lists the keys the state dict has and what type each value is
 class RAGState(TypedDict):
     question: str
-    passages: list[dict] # latest retrieved passages, the new ones after a rewrite
-    evidence_sufficient: bool # evidence checker decision, do we have enough evidence to answer q
-    evidence_reason: str # latest checker reasoning
-    answer: str # generated answer if evidence, or abstention
-    retrieval_query: str # starts as the question; can be rewritten for search
-    rewrite_count: int # allow one rewrite before abstaining
-    first_passages: list[dict] # what the original question retrieved
-    first_evidence_reason: str # checker's reasoning on the first pass, pass or fail
+    passages: list[dict]  # latest retrieved passages, the new ones after a rewrite
+    evidence_sufficient: bool  # evidence checker decision, do we have enough evidence to answer q
+    evidence_reason: str  # latest checker reasoning
+    answer: str  # generated answer if evidence, or abstention
+    retrieval_query: str  # starts as the question; can be rewritten for search
+    rewrite_count: int  # allow one rewrite before abstaining
+    first_passages: list[dict]  # what the original question retrieved
+    first_evidence_reason: str  # checker's reasoning on the first pass, pass or fail
     # Annotated just tacks extra info onto the type; python ignores it, langgraph reads it
     # operator.add is the reducer: a function that tells langgraph how to merge
     # the old value (current path) with a node's update, instead of overwriting it
     # for lists that's old + new, so each node only returns its own name
-    path: Annotated[list[str], operator.add] # the nodes that ran in order 
+    path: Annotated[list[str], operator.add]  # the nodes that ran in order
+
 
 def build_graph(chunks, embeddings, dense_model, sparse_model):
 
@@ -46,7 +43,7 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
         temperature=0,
         reasoning=False,
     )
-    
+
     def format_passages(state: RAGState) -> str:
         # turn passage list of dicts into one string
         id_passages = []
@@ -56,18 +53,22 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
             )
         passage_text = "\n\n".join(id_passages)
         return passage_text
-    
 
-    def retrieve_node(state: RAGState) -> dict: # get the relevant passages for question
-        question = state["retrieval_query"] # same as question but might be rewritten 
-        # get passages expects a dict not a str so create one 
-        passages = get_passages({"question": question}, chunks, embeddings, dense_model, sparse_model)
-        if state["rewrite_count"] == 0: # first search, so save these as the original passages
+    def retrieve_node(state: RAGState) -> dict:  # get the relevant passages for question
+        question = state["retrieval_query"]  # same as question but might be rewritten
+        # get passages expects a dict not a str so create one
+        passages = get_passages(
+            {"question": question}, chunks, embeddings, dense_model, sparse_model
+        )
+        if state["rewrite_count"] == 0:  # first search, so save these as the original passages
             return {"passages": passages, "first_passages": passages, "path": ["retrieve"]}
 
         # search after a rewrite, so leave first_passages alone
-        return {"passages": passages, "path": ["retrieve"]} # langgraph merges this into the current state
-    
+        return {
+            "passages": passages,
+            "path": ["retrieve"],
+        }  # langgraph merges this into the current state
+
     # evidence checker node, see if we have enough evidence to generate an answer
     def check_evidence_node(state: RAGState) -> dict:
 
@@ -83,22 +84,25 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
             or 
             {"sufficient": false, "reason": "What evidence is missing"} 
         """
-    
+
         passage_text = format_passages(state)
-        
-        question_and_passages = "question: " + state["question"] + " relevant passages: " + passage_text
+
+        question_and_passages = (
+            "question: " + state["question"] + " relevant passages: " + passage_text
+        )
 
         # response is a langchain message object, .content is the reply text, which should be a json string
         # this wrapper needs num_batch in invoke options; the constructor ignores it
-        response = llm.invoke([
-            ("system", checker_instructions),
-            ("human", question_and_passages)
-        ], options={"temperature": 0, "num_batch": 2048}, stream=False)
-        
-        res = json.loads(response.content) # turn the json string into a dict
+        response = llm.invoke(
+            [("system", checker_instructions), ("human", question_and_passages)],
+            options={"temperature": 0, "num_batch": 2048},
+            stream=False,
+        )
+
+        res = json.loads(response.content)  # turn the json string into a dict
         evidence_sufficient = res["sufficient"]
 
-        if state["rewrite_count"] == 0: # first check, also save the reason separately 
+        if state["rewrite_count"] == 0:  # first check, also save the reason separately
             return {
                 "evidence_sufficient": evidence_sufficient,
                 "evidence_reason": res["reason"],
@@ -109,8 +113,8 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
         return {
             "evidence_sufficient": evidence_sufficient,
             "evidence_reason": res["reason"],
-            "path": ["check_evidence"]
-            }
+            "path": ["check_evidence"],
+        }
 
     # enough evidence so call model
     def answer_node(state: RAGState):
@@ -122,9 +126,8 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
     def abstain_node(state: RAGState):
         answer = "I don't have enough evidence in the supplied notes to answer this."
         return {"answer": answer, "path": ["abstain"]}
-   
-        
-    # rewrite the question if not enough evidence was retrieved 
+
+    # rewrite the question if not enough evidence was retrieved
     def rewrite_query_node(state: RAGState) -> dict:
         # v1 copied what the passages already covered and dropped the question's topic (Q30 lost "SVD")
         # so: keep every topic, and search for what's missing, not what was already found
@@ -139,21 +142,23 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
 
         # tack on the checker's note so the rewrite knows what was missing
         rewrite_instructions += state["evidence_reason"]
-        
-        
-        response = llm.invoke([
-            ("system", rewrite_instructions),
-            ("human", state["question"])
-        ], options={"temperature": 0, "num_batch": 2048}, stream=False)
+
+        response = llm.invoke(
+            [("system", rewrite_instructions), ("human", state["question"])],
+            options={"temperature": 0, "num_batch": 2048},
+            stream=False,
+        )
 
         # reply should be just the query text, strip extra whitespace
         rewritten_query = response.content.strip()
 
         # return new query and update the rewrite count
-        return {"retrieval_query": rewritten_query, "rewrite_count": state["rewrite_count"] + 1,
-                "path": ["rewrite_query"]}
+        return {
+            "retrieval_query": rewritten_query,
+            "rewrite_count": state["rewrite_count"] + 1,
+            "path": ["rewrite_query"],
+        }
 
-    
     # routing function for the conditional edge: answer, rewrite once, or abstain
     def route_after_check(state: RAGState) -> str:
         if state["evidence_sufficient"]:
@@ -163,11 +168,10 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
         else:
             return "abstain"
 
-    
     graph = StateGraph(RAGState)
 
     # add the retrieve node (the get top k passages step)
-    graph.add_node("retrieve", retrieve_node) 
+    graph.add_node("retrieve", retrieve_node)
     # add evidence checking node
     graph.add_node("check_evidence", check_evidence_node)
     # connect the two w/ an edge
@@ -179,19 +183,19 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
 
     # cond edge, picks next node based on what the routing function returns
     graph.add_conditional_edges("check_evidence", route_after_check)
-    
+
     graph.add_edge("rewrite_query", "retrieve")
-    
 
     # start at the retrieval node
     graph.add_edge(START, "retrieve")
 
-    # both answer and abstain nodes lead to the end 
+    # both answer and abstain nodes lead to the end
     graph.add_edge("answer", END)
     graph.add_edge("abstain", END)
-    
+
     # compile turns graph def into something we can call w/ .invoke()
     return graph.compile()
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the graph on an eval set.")
@@ -211,12 +215,14 @@ def main() -> None:
     for question in eval_set["questions"]:
         # perf_counter is a stopwatch, only differences between two calls mean anything
         start = time.perf_counter()
-        result = graph.invoke({
-            "question": question["question"],
-            "retrieval_query": question["question"],
-            "rewrite_count": 0,
-            "path": []
-        })
+        result = graph.invoke(
+            {
+                "question": question["question"],
+                "retrieval_query": question["question"],
+                "rewrite_count": 0,
+                "path": [],
+            }
+        )
         seconds = time.perf_counter() - start  # whole question, all llm calls included
         answers.append(
             {
@@ -234,7 +240,10 @@ def main() -> None:
                 "seconds": round(seconds, 2),
             }
         )
-        print(f"{question['id']}: done (evidence sufficient: {result['evidence_sufficient']})", flush=True)
+        print(
+            f"{question['id']}: done (evidence sufficient: {result['evidence_sufficient']})",
+            flush=True,
+        )
 
     # same settings as the baseline, plus the graph's path and timing per question
     report = {

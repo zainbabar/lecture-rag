@@ -1,7 +1,7 @@
 import argparse
 import json
-import time
 import os
+import time
 import urllib.request
 from pathlib import Path
 from urllib.error import HTTPError

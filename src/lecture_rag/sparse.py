@@ -1,6 +1,7 @@
 import numpy as np
 import rank_bm25
 
+from .metrics import recall_at_k
 from .prepare import prepare_experiment
 
 
@@ -24,15 +25,6 @@ def retrieve(question, chunks, model, k=3):
     top_k_chunk_ids = [chunks[i]["id"] for i in top_k_indices]
 
     return top_k_chunk_ids
-
-
-# fraction of gold chunks found in the first k results
-# assumes unique retrieved ids and at least one gold id
-def recall_at_k(retrieved_ids, gold_ids, k=3):
-    appeared = [1 if id in gold_ids else 0 for id in retrieved_ids[:k]]
-    count = sum(appeared)
-    recall = count / len(gold_ids)
-    return recall
 
 
 def main():

@@ -2,11 +2,11 @@
 
 [retrieval-eval-set.json](retrieval-eval-set.json) contains 30 development questions over Lectures 1–7: 28 answerable and two unanswerable. The original nine-question seed is kept in [retrieval-check-set.json](retrieval-check-set.json). [heldout-eval-set.json](heldout-eval-set.json) has 16 questions written after the retrievers, prompts, and graph were fixed: 13 answerable and three unanswerable. [test-eval-set.json](test-eval-set.json) is a frozen 40-question test set (34 answerable, six unanswerable), meant to be run once per finished change.
 
-The questions ask for definitions in different wording, specific examples, math notation, and evidence from more than one lecture. Two ask about topics outside the corpus. Each record includes gold chunk IDs, optional supporting IDs, and the source pages used to check them.
+The questions ask for definitions in different wording, specific examples, math notation, and evidence from more than one lecture. Each set also includes questions outside the indexed corpus. Each record includes gold chunk IDs, optional supporting IDs, and the source pages used to check them.
 
-Recall counts how many gold chunks search finds. Other passages may also answer the question, even if they aren't labelled as gold. Questions with multiple gold chunks ask for multiple pieces of evidence. The two unanswerable questions have no gold IDs, so they are left out of recall averages and kept for checking abstention.
+Recall counts how many gold chunks search finds. Other passages may also answer the question, even if they aren't labelled as gold. Questions with multiple gold chunks ask for multiple pieces of evidence. Unanswerable questions have no gold IDs, so they are left out of recall averages and kept for checking abstention.
 
-All retrievers use the same questions, prepared corpus, and labels. Weights were tuned on this set, so these are development results. See the [project README](../README.md) for measurements and answer-review findings.
+All retrievers in a comparison use the same questions, prepared corpus, and labels. Weights were tuned on the development set. The held-out set's failures have since been inspected; the frozen test set has no results yet. See the [project README](../README.md) for measurements and answer-review findings.
 
 ## Corpus checks
 

@@ -1,4 +1,4 @@
-"""Load the experiment files and turn chunks into searchable text."""
+# load the experiment files and turn chunks into searchable text
 
 import argparse
 import hashlib
@@ -12,8 +12,8 @@ DEFAULT_DATASET = ROOT / "evaluation/retrieval-eval-set.json"
 DEFAULT_CONTEXT = ROOT / "search_context.json"
 
 
+# load questions and check their IDs and labels before search
 def load_dataset(path: Path) -> dict:
-    """Load questions and check their IDs and labels before search."""
     data = json.loads(path.read_text())
     if data.get("schema_version") != 1:
         raise ValueError("Unsupported eval schema version")
@@ -40,10 +40,10 @@ def load_dataset(path: Path) -> dict:
     return data
 
 
+# load the selected lectures and add reviewed assumptions to each unit
 def prepare_corpus(
     dataset: dict, root: Path = ROOT, context_path: Path = DEFAULT_CONTEXT
 ) -> list[dict]:
-    """Load the selected lectures and add reviewed assumptions to each unit."""
     context = json.loads(context_path.read_text())
     if context.get("schema_version") != 1:
         raise ValueError("Unsupported context schema version")
@@ -83,16 +83,16 @@ def fingerprint(value: object) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+# return the eval set + searchable chunks, without loading any models
 def prepare_experiment(
     dataset_path: Path = DEFAULT_DATASET, context_path: Path = DEFAULT_CONTEXT, root: Path = ROOT
 ) -> tuple[dict, list[dict]]:
-    """Return the eval set + searchable chunks, without loading any models."""
     dataset = load_dataset(dataset_path)
     return dataset, prepare_corpus(dataset, root, context_path)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description="Load the corpus and validate evaluation inputs.")
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--context", type=Path, default=DEFAULT_CONTEXT)
     parser.add_argument(

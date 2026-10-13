@@ -1,4 +1,4 @@
-"""Checks for corpus/eval wiring. These aren't retrieval-quality tests."""
+# checks for corpus/eval wiring. These aren't retrieval-quality tests
 
 import copy
 import json

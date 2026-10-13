@@ -1,7 +1,8 @@
 from rank_bm25 import BM25Okapi
 
-from .dense import embed_chunks, load_embedding_model, recall_at_k
+from .dense import embed_chunks, load_embedding_model
 from .dense import retrieve as dense_retrieve
+from .metrics import recall_at_k
 from .prepare import prepare_experiment
 from .sparse import retrieve as sparse_retrieve
 from .sparse import tokenize_chunks

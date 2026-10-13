@@ -3,8 +3,8 @@ import re
 from pathlib import Path
 
 
+# read one lecture and return numbered units, followed by an intro entry
 def chunk_markdown(path: Path) -> list[dict]:
-    """Read one lecture and return numbered units, followed by an intro entry."""
     with open(path, "r", encoding="utf-8") as file:
         content = file.read()
 
@@ -140,8 +140,8 @@ def chunk_markdown(path: Path) -> list[dict]:
     return sections
 
 
+# read lectures in order and return summaries plus chunks
 def chunk_files() -> tuple[list[dict], list[dict]]:
-    """Read lectures in order and return summaries plus chunks."""
     path = Path(__file__).resolve().parents[2] / "lectures"
     files = list(path.glob("lecture-*.md"))
     files.sort()  # 01, 02, etc. means sorting puts the lectures in order
@@ -181,12 +181,12 @@ def chunk_files() -> tuple[list[dict], list[dict]]:
     return summary, chunked_files
 
 
+# add the text we'll actually embed/search. Leave the original body alone
 def add_search_text(
     chunked_file: list[dict],
     assumptions: dict[str, str] | None = None,
     global_assumptions: str = "",
 ) -> list[dict]:
-    """Add the text we'll actually embed/search. Leave the original body alone."""
     assumptions = assumptions or {}
     for chunk in chunked_file:
         if chunk["type"] == "intro":

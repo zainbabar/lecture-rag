@@ -1,1 +1,1 @@
-"""Retrieval and grounded answers over MATH 235 notes."""
+# retrieval and grounded answers over MATH 235 notes
