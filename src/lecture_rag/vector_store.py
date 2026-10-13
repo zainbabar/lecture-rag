@@ -20,8 +20,8 @@ class BGEEmbeddings(Embeddings):
     def __init__(self, model: SentenceTransformer) -> None:
         self.model = model # keeps ref to model we already loaded
 
-    # texts is the page_content fields in doucments, langchain gets this and gives it to function
-    # this func builds the vector, chroma builds index after
+    # langchain pulls out each document's page_content and passes those strings here
+    # this func builds the vectors; chroma saves them and updates the index after
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         # encode returns numpy arrays; langchain expects regular python lists
         return self.model.encode(texts).tolist()
@@ -33,14 +33,14 @@ class BGEEmbeddings(Embeddings):
 
 
 # langchain uses Document objects instead of our chunk dicts
-# after we chunk the md, we need to turn it into Document for langchain stuff to work
+# turn our chunk dicts into Documents for langchain's add_documents call
 def chunks_to_documents(chunks: list[dict]) -> list[Document]:
     return [
         Document(
             id=chunk["id"],
             page_content=chunk["search_text"],
             metadata={
-                "id": chunk["id"],  # keep the id here too so retrieval can return it
+                "id": chunk["id"],  # extra copy in metadata; retrieve uses doc.id
                 "lecture": chunk["lecture"],
                 "section": chunk["section"],
                 "type": chunk["type"],
@@ -66,33 +66,30 @@ def load_store(embeddings: Embeddings, path: Path = STORE_PATH) -> Chroma:
 
 # take question dict and return ranked chunk ids like our current hybrid/dense/sparse retrivers
 def retrieve(question: dict, store: Chroma, k: int = 5) -> list[str]:
-    # build langchain retriver from our chroma store, return k results 
+    # make the retriever; k sets how many results to ask for when we invoke it
     retriver = store.as_retriever(search_kwargs={"k": k})
     # .invoke() uses (cosine) similarity search
     # uses the chroma search not our hybrid thing
-    retrived_documents = retriver.invoke(question["question"]) # returns ordered top k matching Documents 
+    retrived_documents = retriver.invoke(question["question"]) # returns up to k Documents in similarity order
 
     # want to get just the ids not the whole document IN ORDER
     ids = [doc.id for doc in retrived_documents]
     return ids
 
 # take the retrieved ids and return formatted passages for generate_answer()
-def get_passages(retrieved_ids: list[str], documents: list[Document]):
+def get_passages(retrieved_ids: list[str], store: Chroma):
+    documents = store.get(retrieved_ids) # parallel lists of ids, text, metadata; same index = same record
     passages = []
-    # for each rank id pair in retrived ids, get matching document 
+    # get() doesn't promise retrieval order, so follow our ranked ids
     for rank, id in enumerate(retrieved_ids, start=1):
-        for doc in documents:
-            if doc.id == id:
-                passages.append({"id": id, "passage": doc.page_content, "rank": rank})
-                break # break out no reason to keep searching after
+        idx = documents["ids"].index(id) # get index of id we want to match up w/ content
+        passage = documents["documents"][idx] # saved page_content strings, not Document objects
+        passages.append({"id": id, "passage": passage, "rank": rank})
     
     return passages
-        
+
     
-
-   
-
-
+        
 def main() -> None:
     parser = argparse.ArgumentParser(description="Index the notes or evaluate Chroma retrieval.")
     # pick one mode; don't re-embed the chunks when we just want to evaluate
