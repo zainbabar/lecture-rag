@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 340" width="910" height="340" role="img" aria-labelledby="t d">
+  <title id="t">Query flow</title>
+  <desc id="d">A question goes to retrieval, then an evidence check. Enough evidence leads to a cited answer. Not enough sends the query to a rewrite and back to retrieval once, then abstains.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; font-size: 14px; text-anchor: middle; }
+    .title { font-weight: 600; font-size: 15px; }
+    .small { font-size: 12px; fill: #57606a; }
+    .edge { stroke: #57606a; stroke-width: 1.6; fill: none; }
+  </style>
+
+  <rect x="0.5" y="0.5" width="909" height="339" rx="12" fill="#f6f8fa" stroke="#d0d7de"/>
+
+  <!-- question -->
+  <rect x="30" y="150" width="120" height="40" rx="20" fill="#ddf4ff" stroke="#0969da" stroke-width="1.6"/>
+  <text x="90" y="175" class="title">Question</text>
+
+  <!-- retrieve -->
+  <rect x="190" y="115" width="230" height="110" rx="8" fill="#ffffff" stroke="#57606a" stroke-width="1.6"/>
+  <text x="305" y="141" class="title">Retrieve</text>
+  <text x="305" y="165">Chroma dense top 10</text>
+  <text x="305" y="184">+ BM25 top 10</text>
+  <text x="305" y="206">merge, rerank to top 5</text>
+
+  <!-- decision -->
+  <polygon points="530,115 610,170 530,225 450,170" fill="#fff8c5" stroke="#9a6700" stroke-width="1.6"/>
+  <text x="530" y="166" class="title">Enough</text>
+  <text x="530" y="184" class="title">evidence?</text>
+
+  <!-- answer -->
+  <rect x="680" y="140" width="200" height="60" rx="8" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.6"/>
+  <text x="780" y="166" class="title">Answer</text>
+  <text x="780" y="186">with chunk-ID citations</text>
+
+  <!-- abstain -->
+  <rect x="450" y="20" width="160" height="42" rx="8" fill="#eaeef2" stroke="#57606a" stroke-width="1.6"/>
+  <text x="530" y="46" class="title">Abstain</text>
+
+  <!-- rewrite -->
+  <rect x="430" y="265" width="200" height="50" rx="8" fill="#eaeef2" stroke="#57606a" stroke-width="1.6"/>
+  <text x="530" y="287" class="title">Rewrite query</text>
+  <text x="530" y="305" class="small">once</text>
+
+  <!-- edges -->
+  <line x1="150" y1="170" x2="188" y2="170" class="edge" marker-end="url(#arrow)"/>
+  <line x1="420" y1="170" x2="448" y2="170" class="edge" marker-end="url(#arrow)"/>
+  <line x1="610" y1="170" x2="678" y2="170" class="edge" marker-end="url(#arrow)"/>
+  <line x1="530" y1="115" x2="530" y2="64" class="edge" marker-end="url(#arrow)"/>
+  <line x1="530" y1="225" x2="530" y2="263" class="edge" marker-end="url(#arrow)"/>
+  <path d="M430,290 H305 V227" class="edge" marker-end="url(#arrow)"/>
+
+  <!-- edge labels -->
+  <text x="644" y="160" class="small">yes</text>
+  <text x="540" y="94" class="small" style="text-anchor:start">no, after the rewrite</text>
+  <text x="540" y="249" class="small" style="text-anchor:start">no, first try</text>
+  <text x="367" y="282" class="small">search again</text>
+</svg>

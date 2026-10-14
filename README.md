@@ -16,22 +16,11 @@ The dev and held-out results guided the reranker choice, so the test column is t
 
 Indexing runs once:
 
-```mermaid
-flowchart LR
-    N["Lecture notes<br/>Markdown"] --> CH["75 chunks<br/>one per numbered unit"] --> E["BGE embeddings"] --> DB[("Chroma index")]
-```
+![Indexing: lecture notes are split into 75 chunks, embedded with BGE, and saved in a Chroma index](assets/index-flow.svg)
 
 Each question goes through this:
 
-```mermaid
-flowchart LR
-    Q(["Question"]) --> R["Retrieve<br/>Chroma dense top 10<br/>+ BM25 top 10<br/>merge, rerank to top 5"]
-    R --> C{"Enough<br/>evidence?"}
-    C -->|yes| A["Answer with<br/>chunk-ID citations"]
-    C -->|"no, first try"| W["Rewrite query<br/>once"]
-    W --> R
-    C -->|"no, after rewrite"| X["Abstain"]
-```
+![Query flow: retrieve, check the evidence, then answer, rewrite the query once, or abstain](assets/query-flow.svg)
 
 1. **Chunks.** One chunk per numbered definition, theorem, example, or exercise from Lectures 1–7. Each chunk gets a one-line lecture prefix and the assumptions I checked for it.
 2. **Candidates.** Chroma returns the top 10 by dense search (BGE-small embeddings, cosine similarity). BM25 returns the top 10 by word match. I merge them into up to 20 chunks.
