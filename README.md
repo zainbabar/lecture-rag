@@ -96,12 +96,7 @@ The run saved IDs without passage snapshots, so I reviewed against the current c
 
 `graph.py` runs the same retrieval and generation as a LangGraph graph, with two extra steps:
 
-```text
-retrieve -> check evidence -> answer
-                 | not enough
-                 v
-           rewrite query (once) -> retrieve -> check evidence -> answer or abstain
-```
+![The LangGraph graph: retrieve, check_evidence, then answer, rewrite_query back to retrieve, or abstain](assets/langgraph-flow.svg)
 
 The checker is a separate Qwen call. It reads the question and the five passages and returns JSON like `{"sufficient": false, "reason": "..."}`. If the evidence isn't enough, the rewriter turns the question into a search query using the checker's reason, and search runs again. After one rewrite the graph abstains instead of looping.
 
