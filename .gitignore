@@ -30,3 +30,6 @@ tmp/
 .DS_Store
 *.swp
 *.swo
+
+# Original course PDFs, not included
+/lecture-pdfs/

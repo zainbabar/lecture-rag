@@ -8,12 +8,9 @@ from typing import Annotated, TypedDict
 
 from langchain_ollama import ChatOllama
 from langgraph.graph import END, START, StateGraph
-from rank_bm25 import BM25Okapi
 
-from .dense import embed_chunks, load_embedding_model
-from .prepare import DEFAULT_DATASET, prepare_experiment
-from .rag import generate_answer, get_passages
-from .sparse import tokenize_chunks
+from .prepare import DEFAULT_DATASET
+from .rag import generate_answer, load_retriever
 
 
 # state is the data one question carries through the graph
@@ -35,7 +32,7 @@ class RAGState(TypedDict):
     path: Annotated[list[str], operator.add]  # the nodes that ran in order
 
 
-def build_graph(chunks, embeddings, dense_model, sparse_model):
+def build_graph(retrieve_passages):
 
     # llm for the checker and rewriter, a langchain wrapper instead of our own http request
     llm = ChatOllama(
@@ -56,10 +53,8 @@ def build_graph(chunks, embeddings, dense_model, sparse_model):
 
     def retrieve_node(state: RAGState) -> dict:  # get the relevant passages for question
         question = state["retrieval_query"]  # same as question but might be rewritten
-        # get passages expects a dict not a str so create one
-        passages = get_passages(
-            {"question": question}, chunks, embeddings, dense_model, sparse_model
-        )
+        # retrieve_passages expects a dict not a str so create one
+        passages = retrieve_passages({"question": question})
         if state["rewrite_count"] == 0:  # first search, so save these as the original passages
             return {"passages": passages, "first_passages": passages, "path": ["retrieve"]}
 
@@ -202,13 +197,12 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=Path("artifacts/graph-answers.json"))
     # swap in evaluation/heldout-eval-set.json for the held-out run
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    # hybrid is the old dense + bm25 fusion, rerank is chroma + bm25 + the reranker
+    parser.add_argument("--retriever", choices=["hybrid", "rerank"], default="rerank")
     args = parser.parse_args()
-    eval_set, chunks = prepare_experiment(args.dataset)
-    # build the indexes once, then give them to the graph
-    dense_model = load_embedding_model()
-    embeddings = embed_chunks(chunks, dense_model)
-    sparse_model = BM25Okapi(tokenize_chunks(chunks))
-    graph = build_graph(chunks, embeddings, dense_model, sparse_model)
+    # build the retrieval setup once, then give it to the graph
+    eval_set, retrieve_passages = load_retriever(args.retriever, args.dataset)
+    graph = build_graph(retrieve_passages)
 
     answers = []
     run_start = time.perf_counter()
@@ -251,7 +245,8 @@ def main() -> None:
         "generation_options": {"temperature": 0, "num_batch": 2048},
         "think": False,
         "stream": False,
-        "dense_weight": 0.75,
+        "retriever": args.retriever,
+        "dense_weight": 0.75 if args.retriever == "hybrid" else None,
         "k": 5,
         "total_seconds": round(time.perf_counter() - run_start, 2),
         "results": answers,

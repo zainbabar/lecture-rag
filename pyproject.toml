@@ -22,11 +22,10 @@ where = ["src"]
 
 [dependency-groups]
 dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
-corpus = ["pymupdf>=1.26,<2"]
 
 [tool.uv]
 package = true
-default-groups = ["dev", "corpus"]
+default-groups = ["dev"]
 
 [tool.ruff]
 target-version = "py312"

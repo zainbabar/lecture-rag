@@ -104,13 +104,34 @@ def generate_answer(question: dict, passages: list[dict], url: str, num_batch: i
     return answer
 
 
-def answer_question(
-    question, chunks, embeddings, dense_model, sparse_model, url, dense_weight=0.75, k=5
-) -> tuple[str, list[dict]]:
+# build the retrieval setup once, return the eval set and a function: question dict -> passages
+def load_retriever(name: str, dataset_path: Path):
+    eval_set, chunks = prepare_experiment(dataset_path)
 
-    passages = get_passages(
-        question, chunks, embeddings, dense_model, sparse_model, dense_weight, k
-    )
+    if name == "rerank":
+        # imported here because pipeline imports vector_store, which imports this file
+        from .pipeline import Pipeline
+
+        pipeline = Pipeline(dataset_path)
+
+        def retrieve_passages(question: dict) -> list[dict]:
+            return pipeline.get_passages(pipeline.retrieve(question))
+
+        return eval_set, retrieve_passages
+
+    # hybrid: build both search indexes once, then reuse them for each question
+    dense_model = load_embedding_model()
+    embeddings = embed_chunks(chunks, dense_model)
+    sparse_model = BM25Okapi(tokenize_chunks(chunks))
+
+    def retrieve_passages(question: dict) -> list[dict]:
+        return get_passages(question, chunks, embeddings, dense_model, sparse_model)
+
+    return eval_set, retrieve_passages
+
+
+def answer_question(question, retrieve_passages, url) -> tuple[str, list[dict]]:
+    passages = retrieve_passages(question)
     answer = generate_answer(question, passages, url)
     return (answer, passages)
 
@@ -121,12 +142,10 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=Path("artifacts/baseline-answers.json"))
     # swap in evaluation/heldout-eval-set.json for the held-out run
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    # hybrid is the old dense + bm25 fusion, rerank is chroma + bm25 + the reranker
+    parser.add_argument("--retriever", choices=["hybrid", "rerank"], default="rerank")
     args = parser.parse_args()
-    dense_model = load_embedding_model()
-    eval_set, chunks = prepare_experiment(args.dataset)
-    # build both search indexes once, then reuse them for each question
-    embeddings = embed_chunks(chunks, dense_model)
-    sparse_model = BM25Okapi(tokenize_chunks(chunks))
+    eval_set, retrieve_passages = load_retriever(args.retriever, args.dataset)
     url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434/api/chat")
     # only the question text goes into search, not its gold labels
     answers = []
@@ -134,9 +153,7 @@ def main() -> None:
     for question in eval_set["questions"]:
         # perf_counter is a stopwatch, only differences between two calls mean anything
         start = time.perf_counter()
-        answer, passages = answer_question(
-            question, chunks, embeddings, dense_model, sparse_model, url
-        )
+        answer, passages = answer_question(question, retrieve_passages, url)
         seconds = time.perf_counter() - start  # whole question, all llm calls included
         answers.append(
             {
@@ -155,7 +172,8 @@ def main() -> None:
         "generation_options": {"temperature": 0, "num_batch": 2048},
         "think": False,
         "stream": False,
-        "dense_weight": 0.75,
+        "retriever": args.retriever,
+        "dense_weight": 0.75 if args.retriever == "hybrid" else None,
         "k": 5,
         "total_seconds": round(time.perf_counter() - run_start, 2),
         "results": answers,
