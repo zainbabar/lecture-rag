@@ -4,7 +4,6 @@ import os
 import time
 import urllib.request
 from pathlib import Path
-from urllib.error import HTTPError
 
 import numpy as np
 from rank_bm25 import BM25Okapi
@@ -12,7 +11,7 @@ from sentence_transformers import SentenceTransformer
 
 from .dense import embed_chunks, load_embedding_model
 from .hybrid import hybrid_retrieve
-from .prepare import DEFAULT_DATASET, fingerprint, prepare_experiment
+from .prepare import DEFAULT_DATASET, prepare_experiment
 from .sparse import tokenize_chunks
 
 
@@ -93,24 +92,12 @@ def generate_answer(question: dict, passages: list[dict], url: str, num_batch: i
     req = urllib.request.Request(
         url, data=json_request, headers={"Content-Type": "application/json"}, method="POST"
     )
-    try:
-        # wait for the complete response
-        with urllib.request.urlopen(req, timeout=120) as response:
-            answer_bytes = response.read()
-            answer_text = answer_bytes.decode("utf-8")
+    # wait for the complete response
+    with urllib.request.urlopen(req, timeout=120) as response:
+        answer_text = response.read().decode("utf-8")
 
-            # parse ollama's json response
-            answer_dict = json.loads(answer_text)
-    except HTTPError as error:
-        # include ollama's error message so we can see why it failed
-        detail = error.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Ollama HTTP {error.code}: {detail}") from error
-
-    # stream=False should give us a finished answer in one response
-    if not answer_dict.get("done"):
-        raise RuntimeError("Ollama returned an incomplete response")
-    if answer_dict.get("done_reason") == "length":
-        raise RuntimeError("Ollama hit its generation limit before finishing the answer")
+    # parse ollama's json response
+    answer_dict = json.loads(answer_text)
     answer = answer_dict["message"]["content"]
     if not answer.strip():
         raise RuntimeError("Ollama returned an empty answer")
@@ -170,8 +157,6 @@ def main() -> None:
         "stream": False,
         "dense_weight": 0.75,
         "k": 5,
-        "corpus_fingerprint": fingerprint(chunks),
-        "dataset_fingerprint": fingerprint(eval_set),
         "total_seconds": round(time.perf_counter() - run_start, 2),
         "results": answers,
     }

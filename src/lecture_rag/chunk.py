@@ -1,5 +1,4 @@
 # split lecture markdown into numbered units, keeping source metadata with each one
-import re
 from pathlib import Path
 
 
@@ -30,14 +29,6 @@ def chunk_markdown(path: Path) -> list[dict]:
     intro_text = ""
     collecting_intro = False
 
-    # pull apart headings like '## Proposition 3.4 — Subspace test (pp. 2–3)'
-    # we want: type, number, title, first page, last page
-    # pp? handles both p. and pp.; the last page is optional
-    heading_pattern = (
-        r"## (\w+) (\d+\.\d+) — (.+) "
-        r"\(pp?\. (\d+)(?:[–-](\d+))?\)"
-    )
-
     # splitlines drops the newlines, so add them back when collecting text
     for line in content.splitlines():
         if line.startswith("# Lecture"):
@@ -63,21 +54,19 @@ def chunk_markdown(path: Path) -> list[dict]:
 
             collecting_intro = False
 
-            # check the whole heading matches, then pull out the pieces
-            match = re.fullmatch(heading_pattern, line.strip())
-            if match is None:
-                raise ValueError(f"{path.name}: malformed unit heading: {line}")
+            # headings look like '## Proposition 3.4 — Subspace test (pp. 2–3)'
+            # split them into type, number, title, and the page range
+            heading_text = line.strip()[3:]  # drop the '## '
+            name, rest = heading_text.split(" — ", 1)
+            unit_type, section = name.split()
+            title, pages_text = rest.rsplit(" (", 1)  # 'pp. 2–3)' or 'p. 4)'
 
-            unit_type, section, title, first_page, last_page = match.groups()
-
-            # if there is only one page, last_page came back as None
-            first_page = int(first_page)
-            last_page = int(last_page) if last_page else first_page
-
-            if last_page < first_page:
-                raise ValueError(f"{path.name}: reversed page range: {line}")
-            if int(section.split(".")[0]) != lecture_number:
-                raise ValueError(f"{path.name}: unit belongs to another lecture: {line}")
+            # 'pp. 2–3)' -> '2-3' -> ['2', '3']
+            pages_text = pages_text.rstrip(")").split(". ")[1].replace("–", "-")
+            page_numbers = pages_text.split("-")
+            first_page = int(page_numbers[0])
+            # if there is only one page, the list only has one number
+            last_page = int(page_numbers[-1])
 
             # +1 because range stops before the end: pages 2–3 -> [2, 3]
             pages = list(range(first_page, last_page + 1))

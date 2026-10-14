@@ -11,7 +11,7 @@ from langgraph.graph import END, START, StateGraph
 from rank_bm25 import BM25Okapi
 
 from .dense import embed_chunks, load_embedding_model
-from .prepare import DEFAULT_DATASET, fingerprint, prepare_experiment
+from .prepare import DEFAULT_DATASET, prepare_experiment
 from .rag import generate_answer, get_passages
 from .sparse import tokenize_chunks
 
@@ -253,8 +253,6 @@ def main() -> None:
         "stream": False,
         "dense_weight": 0.75,
         "k": 5,
-        "corpus_fingerprint": fingerprint(chunks),
-        "dataset_fingerprint": fingerprint(eval_set),
         "total_seconds": round(time.perf_counter() - run_start, 2),
         "results": answers,
     }

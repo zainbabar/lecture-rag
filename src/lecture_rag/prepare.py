@@ -1,7 +1,6 @@
 # load the experiment files and turn chunks into searchable text
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 
@@ -12,115 +11,49 @@ DEFAULT_DATASET = ROOT / "evaluation/retrieval-eval-set.json"
 DEFAULT_CONTEXT = ROOT / "search_context.json"
 
 
-# load questions and check their IDs and labels before search
-def load_dataset(path: Path) -> dict:
-    data = json.loads(path.read_text())
-    if data.get("schema_version") != 1:
-        raise ValueError("Unsupported eval schema version")
-    files = data["corpus"]["files"]
-    questions = data["questions"]
-    if not files or len(files) != len(set(files)):
-        raise ValueError("Corpus files must be nonempty and unique")
-    if not questions:
-        raise ValueError("The eval set has no questions")
-    seen = set()
-    for question in questions:
-        qid = question["id"]
-        if qid in seen or not question["question"].strip():
-            raise ValueError(f"Duplicate ID or empty question: {qid}")
-        seen.add(qid)
-        gold = question["gold_chunk_ids"]
-        if len(gold) != len(set(gold)):
-            raise ValueError(f"Duplicate gold IDs: {qid}")
-        # this dataset uses gold ids for answerable questions, [] for unanswerable
-        if question["answerable"] != bool(gold):
-            raise ValueError(f"Answerability and gold IDs disagree: {qid}")
-        if question["score_retrieval"] != question["answerable"]:
-            raise ValueError(f"Unanswerable questions must stay out of retrieval metrics: {qid}")
-    return data
-
-
 # load the selected lectures and add reviewed assumptions to each unit
-def prepare_corpus(
-    dataset: dict, root: Path = ROOT, context_path: Path = DEFAULT_CONTEXT
-) -> list[dict]:
-    context = json.loads(context_path.read_text())
-    if context.get("schema_version") != 1:
-        raise ValueError("Unsupported context schema version")
-    assumptions = context["chunk_assumptions"]
+def prepare_corpus(dataset: dict, context: dict) -> list[dict]:
+    excluded = dataset["corpus"]["exclude_chunk_types"]
     chunks = []
-    excluded = set(dataset["corpus"]["exclude_chunk_types"])
-    if "intro" not in excluded:
-        raise ValueError("Intro entries are context, not indexed units in this experiment")
 
     # use the explicit file list, not every file that happens to be in lectures/
     for name in dataset["corpus"]["files"]:
-        path = (root / name).resolve()
-        if not path.is_relative_to(root.resolve()):
-            raise ValueError(f"Corpus file is outside the project: {name}")
-        file_chunks = chunk_markdown(path)
-        add_search_text(file_chunks, assumptions, context["global_assumptions"])
-        chunks.extend(c for c in file_chunks if c["type"] not in excluded)
+        file_chunks = chunk_markdown(ROOT / name)
+        add_search_text(file_chunks, context["chunk_assumptions"], context["global_assumptions"])
+        for chunk in file_chunks:
+            if chunk["type"] not in excluded:
+                chunks.append(chunk)
 
-    ids = [c["id"] for c in chunks]
-    if not ids or len(ids) != len(set(ids)):
-        raise ValueError("Prepared chunk IDs must be nonempty and unique")
-    known = set(ids)
     # catch labels pointing at chunks we aren't actually searching
+    known_ids = [chunk["id"] for chunk in chunks]
     for question in dataset["questions"]:
-        referenced = question["gold_chunk_ids"] + question["supporting_chunk_ids"]
-        if not set(referenced) <= known:
-            raise ValueError(f"Gold/supporting IDs outside corpus: {question['id']}")
-    for chunk in chunks:
-        if not chunk["text"].strip() or not chunk["search_text"].strip():
-            raise ValueError(f"Empty chunk: {chunk['id']}")
+        for gold_id in question["gold_chunk_ids"]:
+            if gold_id not in known_ids:
+                raise ValueError(
+                    f"{question['id']} has a gold id that isn't in the corpus: {gold_id}"
+                )
     return chunks
 
 
-def fingerprint(value: object) -> str:
-    # same inputs -> same hash, so we can check what changed between runs
-    encoded = json.dumps(value, sort_keys=True, ensure_ascii=False).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
-
-
 # return the eval set + searchable chunks, without loading any models
-def prepare_experiment(
-    dataset_path: Path = DEFAULT_DATASET, context_path: Path = DEFAULT_CONTEXT, root: Path = ROOT
-) -> tuple[dict, list[dict]]:
-    dataset = load_dataset(dataset_path)
-    return dataset, prepare_corpus(dataset, root, context_path)
+def prepare_experiment(dataset_path: Path = DEFAULT_DATASET) -> tuple[dict, list[dict]]:
+    dataset = json.loads(dataset_path.read_text())
+    context = json.loads(DEFAULT_CONTEXT.read_text())
+    return dataset, prepare_corpus(dataset, context)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Load the corpus and validate evaluation inputs.")
+    parser = argparse.ArgumentParser(description="Load the corpus and check the eval labels.")
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
-    parser.add_argument("--context", type=Path, default=DEFAULT_CONTEXT)
-    parser.add_argument(
-        "--output", type=Path, help="Optional JSON export, e.g. artifacts/chunks.json"
-    )
     args = parser.parse_args()
-    dataset, chunks = prepare_experiment(args.dataset, args.context)
-    if args.output:
-        # save the exact prepared corpus + hashes so later runs can be compared
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(
-                {
-                    "corpus_fingerprint": fingerprint(chunks),
-                    "dataset_fingerprint": fingerprint(dataset),
-                    "chunks": chunks,
-                },
-                ensure_ascii=False,
-                indent=2,
-            )
-            + "\n"
-        )
+
+    dataset, chunks = prepare_experiment(args.dataset)
     answerable = sum(q["answerable"] for q in dataset["questions"])
+    unanswerable = len(dataset["questions"]) - answerable
     print(
         f"{len(chunks)} searchable chunks; {len(dataset['questions'])} questions "
-        f"({answerable} answerable, {len(dataset['questions']) - answerable} unanswerable)."
+        f"({answerable} answerable, {unanswerable} unanswerable)."
     )
-    print("Inputs validated. No embeddings or retrieval results have been generated.")
 
 
 if __name__ == "__main__":

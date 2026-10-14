@@ -201,7 +201,7 @@ ollama pull qwen3.6:35b-a3b
 uv run python -m lecture_rag.rag --output artifacts/baseline-answers.json
 ```
 
-`rag.py` answers all 30 questions and saves JSON with the answers, full retrieved passages, settings, and hashes of the corpus and dataset. The prompt asks for evidence-only answers and citations. Set `OLLAMA_URL` to override the default `http://127.0.0.1:11434/api/chat` endpoint.
+`rag.py` answers all 30 questions and saves JSON with the answers, full retrieved passages, and settings. The prompt asks for evidence-only answers and citations. Set `OLLAMA_URL` to override the default `http://127.0.0.1:11434/api/chat` endpoint.
 
 To run the reranker:
 
@@ -247,7 +247,7 @@ lectures/         Converted notes
 lecture-pdfs/     Original PDFs
 ```
 
-- `src/lecture_rag/chunk.py` / `prepare.py`: split numbered lecture units, attach source metadata and checked assumptions, validate the corpus and labels.
+- `src/lecture_rag/chunk.py` / `prepare.py`: split numbered lecture units, attach source metadata and checked assumptions, check that gold IDs exist in the corpus.
 - `dense.py` / `sparse.py` / `hybrid.py`: NumPy cosine ranking, BM25, and weighted reciprocal rank fusion.
 - `metrics.py`: Recall@k and MRR, shared by the retrievers.
 - `rerank.py`: merge dense and BM25 candidates, score them with a cross-encoder, and evaluate the reranked top 5.
@@ -255,7 +255,7 @@ lecture-pdfs/     Original PDFs
 - `rag.py`: collect evidence, build the prompt, call Ollama, and export answers.
 - `graph.py`: LangGraph state, nodes, and routing for retrieve, check evidence, rewrite once, answer, or abstain.
 
-The tests check corpus loading, eval wiring, and generation requests with mocked HTTP responses. Answer quality needs its own review. The converted corpus has 11 lectures and three practice files; the experiment indexes Lectures 1–7.
+The tests check the metric functions, corpus loading, and that every gold ID exists in the corpus. Answer quality needs its own review. The converted corpus has 11 lectures and three practice files; the experiment indexes Lectures 1–7.
 
 Each chunk keeps its original body and a `search_text` containing the lecture prefix, reviewed assumptions, and body. Lecture intros, trailing Source checks, practice files, and eval material stay out of the index. Source corrections and unresolved issues are recorded in each lecture's Source checks section.
 
